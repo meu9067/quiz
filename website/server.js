@@ -156,7 +156,11 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Routes created from views/pages: ${pageNames.join(', ')}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Routes created from views/pages: ${pageNames.join(', ')}`);
+  });
+}
+
+module.exports = { app, pageNames, dayPageNames, getCurrentDate, formatDateSlug };
