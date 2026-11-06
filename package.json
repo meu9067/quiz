@@ -9,7 +9,7 @@
     "scss": "sass --watch scss/main.scss:public/css/main.css",
     "scss:build": "sass scss/main.scss:public/css/main.css --style=compressed",
     "build:static": "node scripts/build-static.js",
-    "build": "npm run scss:build && npm run build:static",
+    "build": "npm run scss:build && npm run build:static"
   },
   "dependencies": {
     "express": "^4.19.2",
