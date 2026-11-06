@@ -1,6 +1,11 @@
 name = "quiz"
 compatibility_date = "2026-11-06"
+main = "src/worker.js"
 
 [assets]
 directory = "./dist"
+binding = "ASSETS"
 not_found_handling = "404-page"
+# /day/* always goes through src/worker.js (it needs to read
+# ?date_override=true), instead of being served directly as a static asset.
+run_worker_first = ["/day/*"]
