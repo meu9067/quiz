@@ -179,4 +179,15 @@ module.exports = {
       },
     ],
   },
+
+  // Unlocked once the memory game on this day's page is fully solved — see
+  // js/memory-game.js, which reveals the `#memory-form-wrapper` element
+  // wrapping this form after all 8 pairs are matched.
+  dayMemory20261109: {
+    page: '2026-11-09',
+    submitLabel: 'Claim your win',
+    successMessage: 'Nicely played — your win has been recorded!',
+    errorMessage: 'Please enter your name to claim your win.',
+    fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
+  },
 };

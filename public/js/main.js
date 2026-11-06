@@ -2,15 +2,14 @@
 // Form validation/success handling now lives in js/forms.js, shared by every
 // page's form via the `data-js="form"` convention — see that file.
 
-// Set this to a string like '2026-12-25' to manually test the "today" link
-// against a different date in the browser, without waiting for the real
-// date to change. Set back to null to use the visitor's real current date.
-const CLIENT_TEST_DATE_OVERRIDE = null;
-
+// Reads the server's TEST_DATE_OVERRIDE (set via .env — see server.js),
+// baked into the page as `data-test-date-override` on <body>. This keeps
+// the override as a single source of truth: set it once in .env and both
+// the server-rendered date and this "today" link follow it automatically.
+// Empty/missing means "use the visitor's real current date".
 function getTodayDateSlug() {
-  const date = CLIENT_TEST_DATE_OVERRIDE
-    ? new Date(`${CLIENT_TEST_DATE_OVERRIDE}T00:00:00`)
-    : new Date();
+  const override = document.body.dataset.testDateOverride;
+  const date = override ? new Date(`${override}T00:00:00`) : new Date();
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');

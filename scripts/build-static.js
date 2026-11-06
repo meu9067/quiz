@@ -74,11 +74,16 @@ async function main() {
       }
     }
 
-    // Every real views/pages/days/<date>.hbs page.
+    // Every real views/pages/days/<date>.hbs page. Only the actual current
+    // date (per server.js's getCurrentDate()/TEST_DATE_OVERRIDE) renders its
+    // real content (status 200) — every other day renders the same "not
+    // available" message a nonexistent date would (status 404), which is
+    // still written out as that day's static page. Re-run the build (e.g. a
+    // daily CI cron) to roll which day is "available" forward.
     for (const dateSlug of dayPageNames) {
       const { status, body } = await fetchPath(port, `/day/${dateSlug}`);
 
-      if (status !== 200) {
+      if (status !== 200 && status !== 404) {
         throw new Error(`Failed to render /day/${dateSlug} (status ${status})`);
       }
 

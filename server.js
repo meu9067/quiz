@@ -9,10 +9,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- "Today" used to build the /day/<date> link ---
-// Set this to a string like '2026-12-25' to manually test a different day
-// without waiting for the real date to change. Set back to null to use the
-// real current date.
-const TEST_DATE_OVERRIDE = null;
+// Set TEST_DATE_OVERRIDE in .env (e.g. TEST_DATE_OVERRIDE=2026-12-25) to
+// manually test a different day without waiting for the real date to
+// change. Leave it unset/empty to use the real current date. This single
+// value drives both the server-rendered date and the browser's "today"
+// link — see the `data-test-date-override` attribute on <body> in
+// views/layouts/main.hbs, read by public/js/main.js.
+try {
+  process.loadEnvFile();
+} catch (error) {
+  // No .env file present — that's fine, just use real dates.
+}
+
+const TEST_DATE_OVERRIDE = process.env.TEST_DATE_OVERRIDE || null;
 
 function getCurrentDate() {
   return TEST_DATE_OVERRIDE ? new Date(`${TEST_DATE_OVERRIDE}T00:00:00`) : new Date();
@@ -81,6 +90,7 @@ pageNames.forEach((name) => {
       pages: pageNames, // handy for building nav links in header partial
       formsByName: formsByPage[name] || {},
       todayDateSlug: formatDateSlug(getCurrentDate()),
+      testDateOverride: TEST_DATE_OVERRIDE || '',
     });
   });
 
@@ -129,12 +139,28 @@ const dayPageNames = getDayPageNames();
 
 dayPageNames.forEach((dateSlug) => {
   app.get(`/day/${dateSlug}`, (req, res) => {
+    // A day's real content is only shown on its actual date (per
+    // getCurrentDate()/TEST_DATE_OVERRIDE) — visiting another day's page
+    // directly (e.g. a future day whose file already exists in the repo, or
+    // a past day after it's gone by) shows the same "not available" message
+    // as a date with no page file at all. ?date_override=true skips this
+    // check entirely, showing the page regardless of the actual date.
+    const skipDateCheck = req.query?.date_override === 'true';
+    if (!skipDateCheck && dateSlug !== formatDateSlug(getCurrentDate())) {
+      return res.status(404).render('day-unavailable', {
+        title: 'Page not available',
+        pages: pageNames,
+        date: dateSlug,
+      });
+    }
+
     res.render(`pages/days/${dateSlug}`, {
       title: `Day ${dateSlug}`,
       pageName: 'day',
       pages: pageNames,
       date: dateSlug,
       formsByName: formsByPage[dateSlug] || {},
+      testDateOverride: TEST_DATE_OVERRIDE || '',
     });
   });
 });
