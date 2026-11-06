@@ -1,0 +1,19 @@
+<section>
+  <h1>Day 2026-11-09</h1>
+  <p>This page was generated for <strong>{{date}}</strong>.</p>
+  <p id="day-greeting"></p>
+</section>
+
+<section data-js="memory-game" data-memory-pairs="8">
+  <h2>Memory game</h2>
+  <p>Flip the cards and match all 8 pairs to unlock today's form.</p>
+  <div class="memory-grid" data-memory-grid></div>
+  <p data-memory-status></p>
+</section>
+
+<section id="memory-form-wrapper" hidden>
+  <h2>You matched everything! 🎉</h2>
+  {{> form formsByName.dayMemory20261109}}
+</section>
+
+<p><a href="/">Back home</a></p>
