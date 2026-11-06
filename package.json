@@ -10,7 +10,6 @@
     "scss:build": "sass scss/main.scss:public/css/main.css --style=compressed",
     "build:static": "node scripts/build-static.js",
     "build": "npm run scss:build && npm run build:static",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name=website"
   },
   "dependencies": {
     "express": "^4.19.2",
@@ -18,7 +17,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
-    "sass": "^1.77.8",
-    "wrangler": "^3.78.0"
+    "sass": "^1.77.8"
   }
 }
