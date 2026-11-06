@@ -10,6 +10,9 @@
 // Field validation (required, minlength, pattern, min, max, etc.) maps
 // straight to native HTML5 attributes, which js/forms.js relies on to
 // validate.
+//
+// Optional `saveToCookie: '<fieldName>'` stores that field's value in a
+// cookie of the same name once the form succeeds (see js/forms.js).
 module.exports = {
   contact: {
     page: 'contact',
@@ -29,6 +32,17 @@ module.exports = {
     successMessage: "You're subscribed! Check your inbox for a confirmation.",
     errorMessage: 'Please enter a valid email address.',
     fields: [{ name: 'email', label: 'Email', type: 'email', required: true }],
+  },
+
+  nameForm: {
+    page: 'home',
+    submitLabel: 'Save',
+    successMessage: 'Thanks! We will remember your name.',
+    errorMessage: "Please enter your name.",
+    // Stores the given field's value in a cookie of the same name once the
+    // form succeeds — see `saveToCookie` handling in js/forms.js.
+    saveToCookie: 'name',
+    fields: [{ name: 'name', label: "What's your name?", type: 'text', required: true, minlength: 1 }],
   },
 
   signup: {
@@ -97,6 +111,70 @@ module.exports = {
           { value: 'a', label: 'Option A' },
           { value: 'b', label: 'Option B', correct: true },
           { value: 'c', label: 'Option C' },
+        ],
+      },
+    ],
+  },
+
+  // Daily quizzes — each one lives on its own real day page under
+  // views/pages/days/<date>.hbs. The `page` here is the date slug itself,
+  // matching how server.js groups forms by page.
+  dayQuiz20261107: {
+    page: '2026-11-07',
+    submitLabel: 'Submit answer',
+    successMessage: "Correct! You nailed today's quiz.",
+    errorMessage: 'Not quite — try again.',
+    fields: [
+      {
+        name: 'choice',
+        label: 'What is 2 + 2?',
+        type: 'radio',
+        required: true,
+        options: [
+          { value: 'a', label: '3' },
+          { value: 'b', label: '4', correct: true },
+          { value: 'c', label: '5' },
+        ],
+      },
+    ],
+  },
+
+  dayQuiz20261108: {
+    page: '2026-11-08',
+    submitLabel: 'Submit answer',
+    successMessage: 'Correct! Nicely done.',
+    errorMessage: 'Not quite — give it another go.',
+    fields: [
+      {
+        name: 'choice',
+        label: 'Which planet is known as the Red Planet?',
+        type: 'radio',
+        required: true,
+        options: [
+          { value: 'a', label: 'Venus' },
+          { value: 'b', label: 'Mars', correct: true },
+          { value: 'c', label: 'Jupiter' },
+        ],
+      },
+    ],
+  },
+
+
+  dayQuiz20261106: {
+    page: '2026-11-06',
+    submitLabel: 'Submit answer',
+    successMessage: 'Correct! Nicely done.',
+    errorMessage: 'Not quite — give it another go.',
+    fields: [
+      {
+        name: 'choice',
+        label: 'Which planet is known as the Red Planet?',
+        type: 'radio',
+        required: true,
+        options: [
+          { value: 'a', label: 'Venus' },
+          { value: 'b', label: 'Mars', correct: true },
+          { value: 'c', label: 'Jupiter' },
         ],
       },
     ],

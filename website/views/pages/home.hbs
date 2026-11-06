@@ -1,11 +1,14 @@
-<section class="hero">
-  <h1>Welcome Home</h1>
-  <p>This page is rendered from <code>views/pages/home.hbs</code> and automatically routed to <code>/</code>.</p>
-  <button id="demo-btn" class="btn">Click me</button>
-  <p id="demo-output"></p>
+<section>
+  <p id="name-greeting" hidden></p>
+  <div id="name-form-wrapper">
+      <h2>What's your name?</h2>
+
+      {{> form formsByName.nameForm}}
+  </div>
 </section>
 
 <section>
-  <h2>Subscribe for updates</h2>
-  {{> form formsByName.newsletter}}
+  <h2>Today's page</h2>
+  <p>Each day this leads to a new page, named after that day's date.</p>
+  <a href="/day/{{todayDateSlug}}" class="btn">Go to today's page</a>
 </section>

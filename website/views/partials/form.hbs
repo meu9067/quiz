@@ -3,6 +3,7 @@
   data-js="form"
   data-success-message="{{successMessage}}"
   data-error-message="{{errorMessage}}"
+  {{#if saveToCookie}}data-save-cookie-field="{{saveToCookie}}"{{/if}}
 >
   {{#each fields}}
     {{#if (eq type "checkbox")}}

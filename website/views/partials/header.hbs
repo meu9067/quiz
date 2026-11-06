@@ -2,17 +2,5 @@
   <div class="site-header__brand">
     <a href="/">My Site</a>
   </div>
-  <nav class="site-header__nav">
-    <ul>
-      {{#each pages}}
-        <li>
-          {{#if (eq this "home")}}
-            <a href="/">Home</a>
-          {{else}}
-            <a href="/{{this}}">{{this}}</a>
-          {{/if}}
-        </li>
-      {{/each}}
-    </ul>
-  </nav>
+
 </header>
