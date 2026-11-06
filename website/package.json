@@ -1,0 +1,20 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "Express + Handlebars site with dynamic page-folder routing, partials, SCSS and vanilla JS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "scss": "sass --watch scss/main.scss:public/css/main.css",
+    "scss:build": "sass scss/main.scss:public/css/main.css --style=compressed"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-handlebars": "^7.1.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "sass": "^1.77.8"
+  }
+}

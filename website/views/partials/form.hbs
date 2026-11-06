@@ -1,0 +1,58 @@
+<form
+  id="{{id}}-form"
+  data-js="form"
+  data-success-message="{{successMessage}}"
+  data-error-message="{{errorMessage}}"
+>
+  {{#each fields}}
+    {{#if (eq type "checkbox")}}
+      <label class="checkbox-label">
+        <input type="checkbox" name="{{name}}" {{#if required}}required{{/if}} />
+        {{label}}
+      </label>
+    {{else if (eq type "radio")}}
+      <fieldset>
+        <legend>{{label}}</legend>
+        {{#each options}}
+          <label class="radio-label">
+            <input
+              type="radio"
+              name="{{../name}}"
+              value="{{this.value}}"
+              {{#if ../required}}required{{/if}}
+              {{#if this.correct}}data-correct="true"{{/if}}
+            />
+            {{this.label}}
+          </label>
+        {{/each}}
+      </fieldset>
+    {{else}}
+      <label>
+        {{label}}
+        {{#if (eq type "textarea")}}
+          <textarea name="{{name}}" rows="{{rows}}" {{#if required}}required{{/if}}></textarea>
+        {{else if (eq type "select")}}
+          <select name="{{name}}" {{#if required}}required{{/if}}>
+            {{#if placeholder}}<option value="" disabled selected>{{placeholder}}</option>{{/if}}
+            {{#each options}}
+              <option value="{{this.value}}">{{this.label}}</option>
+            {{/each}}
+          </select>
+        {{else}}
+          <input
+            type="{{type}}"
+            name="{{name}}"
+            {{#if required}}required{{/if}}
+            {{#if minlength}}minlength="{{minlength}}"{{/if}}
+            {{#if pattern}}pattern="{{pattern}}"{{/if}}
+            {{#if min}}min="{{min}}"{{/if}}
+            {{#if max}}max="{{max}}"{{/if}}
+            {{#if placeholder}}placeholder="{{placeholder}}"{{/if}}
+          />
+        {{/if}}
+      </label>
+    {{/if}}
+  {{/each}}
+  <button type="submit" class="btn">{{submitLabel}}</button>
+  <p data-form-status></p>
+</form>

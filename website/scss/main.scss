@@ -1,0 +1,158 @@
+// Variables
+$color-primary: #2563eb;
+$color-text: #1f2937;
+$color-bg: #f9fafb;
+$font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+$spacing: 1rem;
+
+@use 'sass:color';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: $font-stack;
+  color: $color-text;
+  background: $color-bg;
+  line-height: 1.5;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing ($spacing * 1.5);
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+
+  &__brand a {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: $color-primary;
+    text-decoration: none;
+  }
+
+  &__nav ul {
+    display: flex;
+    gap: $spacing;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-transform: capitalize;
+
+    a {
+      color: $color-text;
+      text-decoration: none;
+
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+}
+
+main.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: ($spacing * 2) $spacing;
+}
+
+.hero {
+  text-align: center;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background: $color-primary;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+
+  &:hover {
+    background: color.adjust($color-primary, $lightness: -8%);
+  }
+}
+
+.site-footer {
+  text-align: center;
+  padding: $spacing;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing;
+  max-width: 480px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-weight: 600;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font: inherit;
+  }
+
+  .checkbox-label {
+    flex-direction: row;
+    align-items: center;
+    font-weight: 400;
+
+    input[type='checkbox'] {
+      width: auto;
+    }
+  }
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    legend {
+      font-weight: 600;
+      padding: 0;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .radio-label {
+    flex-direction: row;
+    align-items: center;
+    font-weight: 400;
+    gap: 0.5rem;
+
+    input[type='radio'] {
+      width: auto;
+    }
+  }
+}
+
+[data-form-status] {
+  margin: 0;
+  font-weight: 600;
+
+  &.form-status--success {
+    color: #15803d;
+  }
+
+  &.form-status--error {
+    color: #b91c1c;
+  }
+}
