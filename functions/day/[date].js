@@ -5,11 +5,19 @@
 // function fills the gap for every other date: it tries the pre-rendered
 // page first, and falls back to the same "not available" page the Express
 // app serves locally (see server.js's /day/:date 404 handler).
+//
+// ?date_override=true bypasses the "is this actually today" check, same as
+// it does on the live Express server — the build also pre-renders that
+// bypassed content per day (under /day-available/<date>/), so this function
+// just needs to fetch that variant instead of the normal one.
 export async function onRequestGet(context) {
   const { request, env, params } = context;
   const url = new URL(request.url);
+  const bypassDateCheck = url.searchParams.get('date_override') === 'true';
 
-  const pageUrl = new URL(`/day/${params.date}/`, url);
+  const pageUrl = bypassDateCheck
+    ? new URL(`/day-available/${params.date}/`, url)
+    : new URL(`/day/${params.date}/`, url);
   const pageResponse = await env.ASSETS.fetch(new Request(pageUrl, request));
 
   if (pageResponse.status === 200) {
