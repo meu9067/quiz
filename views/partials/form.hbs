@@ -4,6 +4,9 @@
   data-success-message="{{successMessage}}"
   data-error-message="{{errorMessage}}"
   {{#if saveToCookie}}data-save-cookie-field="{{saveToCookie}}"{{/if}}
+  {{#if maxAttempts}}data-max-attempts="{{maxAttempts}}"{{/if}}
+  {{#if lockoutMessage}}data-lockout-message="{{lockoutMessage}}"{{/if}}
+  {{#if quizStorageKey}}data-quiz-storage-key="{{quizStorageKey}}"{{/if}}
 >
   {{#each fields}}
     {{#if (eq type "checkbox")}}

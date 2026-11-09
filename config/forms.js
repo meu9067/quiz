@@ -16,6 +16,74 @@
 //
 // Optional `saveToCookie: '<fieldName>'` stores that field's value in a
 // cookie of the same name once the form succeeds (see js/forms.js).
+//
+// Quizzes (multiple-choice or image-choice, "pick the right answer") share
+// one more behaviour: only one wrong try is allowed. A second miss locks the
+// form, shows a final message, and records the loss in the shared cookie
+// (see `maxAttempts`/`lockoutMessage` in js/forms.js) so refreshing the page
+// doesn't grant a new attempt. `radioQuiz(...)` and `imageQuiz(...)` below
+// build that whole form config from just a page, a question, and the
+// options — to reuse the same quiz format on another page, add a new entry
+// that calls one of them, e.g.:
+//
+//   dayQuiz1112: radioQuiz({
+//     page: '11-12',
+//     question: 'How many legs does a spider have?',
+//     options: [
+//       { value: 'a', label: '6' },
+//       { value: 'b', label: '8', correct: true },
+//       { value: 'c', label: '10' },
+//     ],
+//   }),
+//
+//   dayQuiz1113: imageQuiz({
+//     page: '11-13',
+//     question: 'Which one is the odd one out?',
+//     options: [
+//       { value: 'a', label: 'A', image: '/images/quiz/pic1.png' },
+//       { value: 'b', label: 'B', image: '/images/quiz/pic2.png', correct: true },
+//       { value: 'c', label: 'C', image: '/images/quiz/pic3.png' },
+//     ],
+//   }),
+//
+// Every option below the `page`/`question`/`options` can be left out to use
+// the sensible default shown in each helper's signature.
+function quiz(fieldType) {
+  return ({
+    page,
+    question,
+    options,
+    storageKey,
+    maxAttempts = 1,
+    submitLabel = 'Submit answer',
+    successMessage = 'Correct! Nicely done.',
+    errorMessage = 'Not quite — give it another go.',
+    lockoutMessage = "You've used up your attempt for today — come back another day to try again.",
+  }) => ({
+    page,
+    submitLabel,
+    successMessage,
+    errorMessage,
+    maxAttempts,
+    lockoutMessage,
+    // Keyed by page so the same question reused on two different pages
+    // doesn't share a lockout — see data-quiz-storage-key in js/forms.js.
+    quizStorageKey: storageKey || `${fieldType}-quiz-${page}`,
+    fields: [
+      {
+        name: 'choice',
+        label: question,
+        type: fieldType,
+        required: true,
+        options,
+      },
+    ],
+  });
+}
+
+const radioQuiz = quiz('radio');
+const imageQuiz = quiz('image');
+
 module.exports = {
   contact: {
     page: 'contact',
@@ -99,89 +167,51 @@ module.exports = {
     ],
   },
 
-  quiz: {
+  quiz: radioQuiz({
     page: 'quiz',
-    submitLabel: 'Submit answer',
+    question: 'Which option is correct?',
     successMessage: "Correct! That's the one.",
     errorMessage: 'Not quite — pick the middle option.',
-    fields: [
-      {
-        name: 'choice',
-        label: 'Which option is correct?',
-        type: 'radio',
-        required: true,
-        options: [
-          { value: 'a', label: 'Option A' },
-          { value: 'b', label: 'Option B', correct: true },
-          { value: 'c', label: 'Option C' },
-        ],
-      },
+    options: [
+      { value: 'a', label: 'Option A' },
+      { value: 'b', label: 'Option B', correct: true },
+      { value: 'c', label: 'Option C' },
     ],
-  },
+  }),
 
   // Daily quizzes — each one lives on its own real day page under
   // views/pages/days/<date>.hbs. The `page` here is the date slug itself,
   // matching how server.js groups forms by page.
-  dayQuiz1107: {
+  dayQuiz1107: radioQuiz({
     page: '11-07',
-    submitLabel: 'Submit answer',
+    question: 'What is 2 + 2?',
     successMessage: "Correct! You nailed today's quiz.",
-    errorMessage: 'Not quite — try again.',
-    fields: [
-      {
-        name: 'choice',
-        label: 'What is 2 + 2?',
-        type: 'radio',
-        required: true,
-        options: [
-          { value: 'a', label: '3' },
-          { value: 'b', label: '4', correct: true },
-          { value: 'c', label: '5' },
-        ],
-      },
+    options: [
+      { value: 'a', label: '3' },
+      { value: 'b', label: '4', correct: true },
+      { value: 'c', label: '5' },
     ],
-  },
+  }),
 
-  dayQuiz1108: {
+  dayQuiz1108: radioQuiz({
     page: '11-08',
-    submitLabel: 'Submit answer',
-    successMessage: 'Correct! Nicely done.',
-    errorMessage: 'Not quite — give it another go.',
-    fields: [
-      {
-        name: 'choice',
-        label: 'Which planet is known as the Red Planet?',
-        type: 'radio',
-        required: true,
-        options: [
-          { value: 'a', label: 'Venus' },
-          { value: 'b', label: 'Mars', correct: true },
-          { value: 'c', label: 'Jupiter' },
-        ],
-      },
+    question: 'Which planet is known as the Red Planet?',
+    options: [
+      { value: 'a', label: 'Venus' },
+      { value: 'b', label: 'Mars', correct: true },
+      { value: 'c', label: 'Jupiter' },
     ],
-  },
+  }),
 
-
-  dayQuiz1106: {
+  dayQuiz1106: imageQuiz({
     page: '11-06',
-    submitLabel: 'Submit answer',
-    successMessage: 'Correct! Nicely done.',
-    errorMessage: 'Not quite — give it another go.',
-    fields: [
-      {
-        name: 'choice',
-        label: 'Which planet is known as the Red Planet?',
-        type: 'image',
-        required: true,
-        options: [
-          { value: 'a', label: 'Venus', image: '/images/quiz/venus.svg' },
-          { value: 'b', label: 'Mars', image: '/images/quiz/mars.svg', correct: true },
-          { value: 'c', label: 'Jupiter', image: '/images/quiz/jupiter.svg' },
-        ],
-      },
+    question: 'Sélectionne le chien que papi avait quand il était jeune.',
+    options: [
+      { value: 'a', label: 'A', image: '/images/quiz/dog1.png' },
+      { value: 'b', label: 'B', image: '/images/quiz/dog2.png', correct: true },
+      { value: 'c', label: 'C', image: '/images/quiz/dog3.png' },
     ],
-  },
+  }),
 
   // Unlocked once the memory game on this day's page is fully solved — see
   // js/memory-game.js, which reveals the `#memory-form-wrapper` element

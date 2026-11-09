@@ -147,3 +147,80 @@ test('a status element targeted via data-status-target still receives messages',
   assert.equal(status.textContent, 'Pick one.');
   assert.ok(status.classList.contains('form-status--error'));
 });
+
+function quizMarkup() {
+  return `
+    <form
+      id="dayQuiz-form"
+      data-js="form"
+      data-success-message="Correct!"
+      data-error-message="Not quite — try again."
+      data-max-attempts="1"
+      data-lockout-message="You've used up your attempt."
+      data-quiz-storage-key="image-quiz-11-06"
+    >
+      <input type="radio" name="choice" value="a" />
+      <input type="radio" name="choice" value="b" data-correct="true" />
+      <input type="radio" name="choice" value="c" />
+      <button type="submit">Submit</button>
+      <p data-form-status></p>
+    </form>
+  `;
+}
+
+test('a quiz with data-max-attempts allows one wrong answer before locking', async () => {
+  const dom = await renderForm(quizMarkup());
+  const form = dom.window.document.getElementById('dayQuiz-form');
+  const status = form.querySelector('[data-form-status]');
+
+  form.querySelector('[value="a"]').checked = true;
+  submit(form);
+
+  assert.equal(status.textContent, 'Not quite — try again.');
+  assert.ok(status.classList.contains('form-status--error'));
+  assert.equal(form.querySelector('[value="b"]').disabled, false, 'inputs stay enabled after the first miss');
+  assert.equal(dom.window.SiteCookie.getGame('image-quiz-11-06'), null);
+});
+
+test('a quiz with data-max-attempts locks and records the cookie after a second wrong answer', async () => {
+  const dom = await renderForm(quizMarkup());
+  const form = dom.window.document.getElementById('dayQuiz-form');
+  const status = form.querySelector('[data-form-status]');
+
+  form.querySelector('[value="a"]').checked = true;
+  submit(form);
+
+  form.querySelector('[value="c"]').checked = true;
+  submit(form);
+
+  assert.equal(status.textContent, "You've used up your attempt.");
+  assert.ok(status.classList.contains('form-status--error'));
+  assert.ok([...form.elements].every((field) => field.disabled), 'every field is disabled once locked');
+
+  const saved = dom.window.SiteCookie.getGame('image-quiz-11-06');
+  assert.ok(saved && saved.failed === true);
+});
+
+test('a quiz with data-max-attempts stays locked across a fresh page load once already failed', async () => {
+  const firstLoad = await renderForm(quizMarkup());
+  const firstForm = firstLoad.window.document.getElementById('dayQuiz-form');
+  firstForm.querySelector('[value="a"]').checked = true;
+  submit(firstForm);
+  firstForm.querySelector('[value="c"]').checked = true;
+  submit(firstForm);
+
+  const cookie = firstLoad.window.document.cookie;
+
+  const html = `<!DOCTYPE html><html><body>${quizMarkup()}<script>${SITE_COOKIE_JS}</script><script>${FORMS_JS}</script></body></html>`;
+  const secondLoad = new (require('jsdom').JSDOM)(html, { runScripts: 'dangerously', url: 'http://localhost/' });
+  secondLoad.window.document.cookie = cookie;
+  await new Promise((resolve) => {
+    secondLoad.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
+  });
+
+  const secondForm = secondLoad.window.document.getElementById('dayQuiz-form');
+  const secondStatus = secondForm.querySelector('[data-form-status]');
+
+  assert.equal(secondStatus.textContent, "You've used up your attempt.");
+  assert.ok([...secondForm.elements].every((field) => field.disabled));
+});
