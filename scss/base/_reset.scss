@@ -1,0 +1,27 @@
+// Global box-sizing reset and base body styles.
+@use '../abstracts/variables' as *;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: $font-stack;
+  color: $color-text;
+  line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+
+  // bg.png is the only background image left on the body. Every other
+  // decorative image that used to live in this background-image list now
+  // lives in the DOM as an <img>, placed inside the header (top edge) or
+  // the footer (bottom edge), see layout/_site-frame.scss.
+  background-image: url('/images/background/bg.png');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}

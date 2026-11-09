@@ -1,0 +1,58 @@
+// Hangman game: on-screen keyboard, word display, and illustration.
+@use '../abstracts/variables' as *;
+
+.hangman-keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-width: 480px;
+  margin: $spacing 0;
+}
+
+.hangman-key {
+  min-width: 2.25rem;
+  padding: 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  &.is-correct {
+    border-color: #15803d;
+    color: #15803d;
+  }
+
+  &.is-wrong {
+    border-color: #b91c1c;
+    color: #b91c1c;
+  }
+}
+
+.hangman-word {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.25rem;
+  margin: $spacing 0;
+}
+
+.hangman-image {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin: $spacing 0;
+}
+
+[data-hangman-status] {
+  font-weight: 600;
+}

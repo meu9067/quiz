@@ -1,0 +1,17 @@
+// Custom web fonts. The .otf files live in public/fonts and are exposed as
+// the 'Childos' family (see $font-family-1 in abstracts/_variables.scss).
+@font-face {
+  font-family: 'Capriola';
+  src: url('/fonts/Capriola-Regular.ttf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Waffle';
+  src: url('/fonts/Waffle-Soft.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

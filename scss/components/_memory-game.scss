@@ -1,0 +1,64 @@
+// Memory-matching game grid and flip-card animation.
+@use '../abstracts/variables' as *;
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  max-width: 420px;
+  margin: $spacing 0;
+}
+
+.memory-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+  perspective: 600px;
+
+  &__face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    border-radius: 8px;
+    backface-visibility: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  &__face--back {
+    background: $color-primary;
+    color: #fff;
+    transform: rotateY(0deg);
+  }
+
+  &__face--front {
+    background: #fff;
+    transform: rotateY(-180deg);
+  }
+
+  &.is-flipped,
+  &.is-matched {
+    .memory-card__face--back {
+      transform: rotateY(180deg);
+    }
+
+    .memory-card__face--front {
+      transform: rotateY(0deg);
+    }
+  }
+
+  &.is-matched {
+    border-color: #15803d;
+    cursor: default;
+  }
+}
+
+[data-memory-status] {
+  font-weight: 600;
+}

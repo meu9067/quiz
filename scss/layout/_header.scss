@@ -1,0 +1,36 @@
+// Site-wide header bar: brand link and nav list.
+@use '../abstracts/variables' as *;
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing ($spacing * 1.5);
+  background: transparent;
+  border-bottom: 1px solid #e5e7eb;
+
+  &__brand a {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: $color-primary;
+    text-decoration: none;
+  }
+
+  &__nav ul {
+    display: flex;
+    gap: $spacing;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-transform: capitalize;
+
+    a {
+      color: $color-text;
+      text-decoration: none;
+
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+}

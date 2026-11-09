@@ -1,0 +1,130 @@
+// Decorative frame images that used to be part of the body background.
+// They are rendered as real <img> elements inside the header/footer
+// partials, but kept fixed to the viewport edges so the layout matches the
+// original frame look.
+.site-frame {
+  &__img {
+    position: fixed;
+    height: auto;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  // Top edge images, rendered in the header.
+  &__img--top1 {
+    top: 0;
+    width: 240px;
+    left: calc((100vw - 240px) * 0.05);
+  }
+
+  &__img--top2 {
+    top: 0;
+    width: 260px;
+    left: calc((100vw - 260px) * 0.5);
+  }
+
+  &__img--top3 {
+    top: 0;
+    width: 130px;
+    left: calc((100vw - 130px) * 0.92);
+  }
+
+  // Bottom edge images, rendered in the footer.
+  &__img--bottom1 {
+    bottom: 0;
+    width: 270px;
+    left: calc((100vw - 270px) * 0.05);
+  }
+
+  &__img--bottom2 {
+    bottom: -10px;
+    width: 180px;
+    left: calc((100vw - 180px) * 0.35);
+  }
+
+  &__img--bottom3 {
+    bottom: -10px;
+    width: 240px;
+    left: calc((100vw - 240px) * 0.65);
+  }
+
+  &__img--bottom4 {
+    bottom: -5px;
+    width: 100px;
+    left: calc((100vw - 100px) * 0.92);
+  }
+
+  // Left edge images, rendered in the header.
+  &__img--left1 {
+    left: 0;
+    width: 50px;
+    top: 2%;
+  }
+
+  &__img--left2 {
+    left: 0;
+    width: 100px;
+    top: 16%;
+  }
+
+  &__img--left3 {
+    left: 0;
+    width: 80px;
+    top: 30%;
+  }
+
+  &__img--left4 {
+    left: 0;
+    width: 110px;
+    top: 44%;
+  }
+
+  &__img--left5 {
+    left: 0;
+    width: 90px;
+    top: 58%;
+  }
+
+  &__img--left6 {
+    left: 0;
+    width: 60px;
+    top: 72%;
+  }
+
+  &__img--left7 {
+    left: 0;
+    width: 80px;
+    top: 86%;
+  }
+
+  // Right edge images, rendered in the footer.
+  &__img--right2 {
+    right: 0;
+    width: 110px;
+    top: 4%;
+  }
+
+  &__img--right3 {
+    right: 0;
+    width: 120px;
+    top: 20%;
+  }
+
+  &__img--right1 {
+    right: 0;
+    width: 90px;
+    top: 36%;
+  }
+
+  &__img--right4 {
+    right: 0;
+    width: 220px;
+    top: 62%;
+  }
+
+  &__img--right6 {
+    right: 0;
+    width: 100px;
+    top: 84%;
+  }
+}

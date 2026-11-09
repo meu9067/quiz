@@ -1,0 +1,28 @@
+// The <main> wrapper and generic hero/page-level styles.
+@use '../abstracts/variables' as *;
+
+main.page {
+  max-width: 1260px;
+  margin: 50px auto;
+  padding: $spacing;
+  background: #fff;
+  width: 80vw;
+  border-radius: 10px;
+  box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.hero {
+  text-align: center;
+}
+
+
+h1 {
+  text-align: center;
+}
+
+#day-greeting {
+  text-align: center;
+}
+h1,h2,h3,h4,h5,h6, p {
+  font-family: $font-family-1;
+}
