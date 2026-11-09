@@ -1,0 +1,13 @@
+<section>
+  <h1>All days</h1>
+  <p>Every day page that exists so far — new ones show up here automatically, nothing to add by hand.</p>
+  {{#if days.length}}
+    <ul id="days-list">
+      {{#each days}}
+        <li><a href="/day/{{this}}?date=true">{{this}}</a></li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No day pages yet.</p>
+  {{/if}}
+</section>
