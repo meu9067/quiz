@@ -90,14 +90,14 @@ async function main() {
       writeHtml(path.join('day', dateSlug), body);
 
       // Also pre-render the real content with the date check bypassed
-      // (?date_override=true), stored under day-available/<date>/, so the
+      // (?date=true), stored under day-available/<date>/, so the
       // /day/* Pages Function can serve it on request even though the
       // static dist/day/<date>/ page above shows "not available" for every
       // day except whichever one was "today" at build time.
-      const bypassed = await fetchPath(port, `/day/${dateSlug}?date_override=true`);
+      const bypassed = await fetchPath(port, `/day/${dateSlug}?date=true`);
 
       if (bypassed.status !== 200) {
-        throw new Error(`Failed to render /day/${dateSlug}?date_override=true (status ${bypassed.status})`);
+        throw new Error(`Failed to render /day/${dateSlug}?date=true (status ${bypassed.status})`);
       }
 
       writeHtml(path.join('day-available', dateSlug), bypassed.body);

@@ -6,7 +6,10 @@
 // `{{> form }}` partial (see views/partials/form.hbs).
 //
 // Field types supported by the partial: text, email, password, tel, number,
-// textarea, select (needs `options: [{ value, label }]`), checkbox.
+// textarea, select (needs `options: [{ value, label }]`), checkbox, radio
+// (needs `options: [{ value, label, correct }]`), image (like radio, but each
+// option also needs an `image` URL and renders as a picture to click instead
+// of text — see views/partials/form.hbs).
 // Field validation (required, minlength, pattern, min, max, etc.) maps
 // straight to native HTML5 attributes, which js/forms.js relies on to
 // validate.
@@ -119,8 +122,8 @@ module.exports = {
   // Daily quizzes — each one lives on its own real day page under
   // views/pages/days/<date>.hbs. The `page` here is the date slug itself,
   // matching how server.js groups forms by page.
-  dayQuiz20261107: {
-    page: '2026-11-07',
+  dayQuiz1107: {
+    page: '11-07',
     submitLabel: 'Submit answer',
     successMessage: "Correct! You nailed today's quiz.",
     errorMessage: 'Not quite — try again.',
@@ -139,8 +142,8 @@ module.exports = {
     ],
   },
 
-  dayQuiz20261108: {
-    page: '2026-11-08',
+  dayQuiz1108: {
+    page: '11-08',
     submitLabel: 'Submit answer',
     successMessage: 'Correct! Nicely done.',
     errorMessage: 'Not quite — give it another go.',
@@ -160,8 +163,8 @@ module.exports = {
   },
 
 
-  dayQuiz20261106: {
-    page: '2026-11-06',
+  dayQuiz1106: {
+    page: '11-06',
     submitLabel: 'Submit answer',
     successMessage: 'Correct! Nicely done.',
     errorMessage: 'Not quite — give it another go.',
@@ -169,12 +172,12 @@ module.exports = {
       {
         name: 'choice',
         label: 'Which planet is known as the Red Planet?',
-        type: 'radio',
+        type: 'image',
         required: true,
         options: [
-          { value: 'a', label: 'Venus' },
-          { value: 'b', label: 'Mars', correct: true },
-          { value: 'c', label: 'Jupiter' },
+          { value: 'a', label: 'Venus', image: '/images/quiz/venus.svg' },
+          { value: 'b', label: 'Mars', image: '/images/quiz/mars.svg', correct: true },
+          { value: 'c', label: 'Jupiter', image: '/images/quiz/jupiter.svg' },
         ],
       },
     ],
@@ -183,10 +186,32 @@ module.exports = {
   // Unlocked once the memory game on this day's page is fully solved — see
   // js/memory-game.js, which reveals the `#memory-form-wrapper` element
   // wrapping this form after all 8 pairs are matched.
-  dayMemory20261109: {
-    page: '2026-11-09',
+  dayMemory1109: {
+    page: '11-09',
     submitLabel: 'Claim your win',
     successMessage: 'Nicely played — your win has been recorded!',
+    errorMessage: 'Please enter your name to claim your win.',
+    fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
+  },
+
+  // Unlocked once the hangman game on this day's page is won — see
+  // js/hangman-game.js, which reveals the `#hangman-form-wrapper` element
+  // wrapping this form once the word is fully guessed.
+  dayHangman1110: {
+    page: '11-10',
+    submitLabel: 'Claim your win',
+    successMessage: 'Nicely guessed — your win has been recorded!',
+    errorMessage: 'Please enter your name to claim your win.',
+    fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
+  },
+
+  // Unlocked once the drag-and-drop game on this day's page is won — see
+  // js/drop-game.js, which reveals the `#drop-form-wrapper` element wrapping
+  // this form once all 5 valid objects have been dropped in the box.
+  dayDrop1111: {
+    page: '11-11',
+    submitLabel: 'Claim your win',
+    successMessage: 'Great sorting — your win has been recorded!',
     errorMessage: 'Please enter your name to claim your win.',
     fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
   },

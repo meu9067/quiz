@@ -5,13 +5,17 @@ const path = require('node:path');
 const { JSDOM } = require('jsdom');
 
 const FORMS_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'forms.js'), 'utf8');
+const SITE_COOKIE_JS = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'js', 'site-cookie.js'),
+  'utf8'
+);
 
 // Builds a fresh document containing the given form markup plus the real
-// public/js/forms.js (inlined, so it runs through the DOM/event lifecycle
-// exactly like it does in a browser — including waiting for
-// DOMContentLoaded before wiring up listeners).
+// public/js/site-cookie.js and public/js/forms.js (inlined, so it runs
+// through the DOM/event lifecycle exactly like it does in a browser —
+// including waiting for DOMContentLoaded before wiring up listeners).
 async function renderForm(formHtml) {
-  const html = `<!DOCTYPE html><html><body>${formHtml}<script>${FORMS_JS}</script></body></html>`;
+  const html = `<!DOCTYPE html><html><body>${formHtml}<script>${SITE_COOKIE_JS}</script><script>${FORMS_JS}</script></body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
 
   await new Promise((resolve) => {
@@ -110,7 +114,7 @@ test('a quiz-style form with data-correct accepts the right choice', async () =>
   assert.ok(status.classList.contains('form-status--success'));
 });
 
-test('data-save-cookie-field stores the given field as a cookie on success', async () => {
+test('data-save-cookie-field stores the given field in the shared site cookie on success', async () => {
   const dom = await renderForm(`
     <form id="nameForm-form" data-js="form" data-success-message="Saved!" data-error-message="Enter a name." data-save-cookie-field="name">
       <input name="name" required minlength="1" />
@@ -123,7 +127,8 @@ test('data-save-cookie-field stores the given field as a cookie on success', asy
 
   submit(form);
 
-  assert.match(dom.window.document.cookie, /(?:^|; )name=Grace/);
+  assert.equal(dom.window.SiteCookie.get('name'), 'Grace');
+  assert.match(dom.window.document.cookie, /(?:^|; )site-data=/);
 });
 
 test('a status element targeted via data-status-target still receives messages', async () => {

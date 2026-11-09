@@ -10,10 +10,9 @@
 function getTodayDateSlug() {
   const override = document.body.dataset.testDateOverride;
   const date = override ? new Date(`${override}T00:00:00`) : new Date();
-  const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return `${month}-${day}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dayGreeting = document.getElementById('day-greeting');
 
   if (dayGreeting) {
-    const name = getCookie('name');
+    const name = window.SiteCookie.get('name');
     dayGreeting.textContent = name
       ? `Hello, ${name}! Enjoy today's page.`
       : "We don't know your name yet — set it on the home page for a personal greeting.";
@@ -58,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function showNameState() {
-    const name = getCookie('name');
+    const name = window.SiteCookie.get('name');
 
     if (name) {
       nameGreeting.textContent = `Hello, ${name}!`;
@@ -68,10 +67,5 @@ document.addEventListener('DOMContentLoaded', () => {
       nameGreeting.hidden = true;
       nameFormWrapper.hidden = false;
     }
-  }
-
-  function getCookie(key) {
-    const match = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : null;
   }
 });

@@ -28,10 +28,9 @@ function getCurrentDate() {
 }
 
 function formatDateSlug(date) {
-  const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return `${month}-${day}`;
 }
 
 // --- Build a lookup of forms per page from config/forms.js ---
@@ -80,29 +79,9 @@ function getPageNames() {
 
 const pageNames = getPageNames();
 
-pageNames.forEach((name) => {
-  const routePath = name === 'home' ? '/' : `/${name}`;
-
-  app.get(routePath, (req, res) => {
-    res.render(`pages/${name}`, {
-      title: name.charAt(0).toUpperCase() + name.slice(1),
-      pageName: name,
-      pages: pageNames, // handy for building nav links in header partial
-      formsByName: formsByPage[name] || {},
-      todayDateSlug: formatDateSlug(getCurrentDate()),
-      testDateOverride: TEST_DATE_OVERRIDE || '',
-    });
-  });
-
-  // Also expose /home even when it's mapped to "/" so both work.
-  if (name === 'home') {
-    app.get('/home', (req, res) => res.redirect('/'));
-  }
-});
-
 // --- A real page per day, under views/pages/days ---
-// Each day gets its own actual .hbs file, e.g. views/pages/days/2026-11-06.hbs
-// -> routed to /day/2026-11-06, the same way views/pages are routed.
+// Each day gets its own actual .hbs file, e.g. views/pages/days/11-06.hbs
+// -> routed to /day/11-06, the same way views/pages are routed.
 // The file for "today" (per getCurrentDate(), which TEST_DATE_OVERRIDE can
 // redirect) is created automatically the first time it's requested, so every
 // day is backed by a real, inspectable template rather than one generic
@@ -135,17 +114,45 @@ function getDayPageNames() {
 // Make sure today's real page file exists before routes are registered.
 ensureDayPageExists(formatDateSlug(getCurrentDate()));
 
-const dayPageNames = getDayPageNames();
+// All day pages that exist on disk, sorted. Used both to register /day/*
+// routes below and to list them on the "days" page, so that page never
+// needs to be updated by hand as new days are added.
+const dayPageNames = getDayPageNames().sort();
 
+pageNames.forEach((name) => {
+  const routePath = name === 'home' ? '/' : `/${name}`;
+
+  app.get(routePath, (req, res) => {
+    res.render(`pages/${name}`, {
+      title: name.charAt(0).toUpperCase() + name.slice(1),
+      pageName: name,
+      pages: pageNames, // handy for building nav links in header partial
+      days: dayPageNames, // all day pages that exist on disk, so this list stays in sync automatically
+      formsByName: formsByPage[name] || {},
+      todayDateSlug: formatDateSlug(getCurrentDate()),
+      testDateOverride: TEST_DATE_OVERRIDE || '',
+    });
+  });
+
+  // Also expose /home even when it's mapped to "/" so both work.
+  if (name === 'home') {
+    app.get('/home', (req, res) => res.redirect('/'));
+  }
+});
+
+// --- A real page per day, under views/pages/days ---
+// (day page files + dayPageNames are computed above, before pageNames.forEach,
+// so every page's render context — including the "days" listing page — can
+// include the up-to-date list of days.)
 dayPageNames.forEach((dateSlug) => {
   app.get(`/day/${dateSlug}`, (req, res) => {
     // A day's real content is only shown on its actual date (per
     // getCurrentDate()/TEST_DATE_OVERRIDE) — visiting another day's page
     // directly (e.g. a future day whose file already exists in the repo, or
     // a past day after it's gone by) shows the same "not available" message
-    // as a date with no page file at all. ?date_override=true skips this
+    // as a date with no page file at all. ?date=true skips this
     // check entirely, showing the page regardless of the actual date.
-    const skipDateCheck = req.query?.date_override === 'true';
+    const skipDateCheck = req.query?.date === 'true';
     if (!skipDateCheck && dateSlug !== formatDateSlug(getCurrentDate())) {
       return res.status(404).render('day-unavailable', {
         title: 'Page not available',

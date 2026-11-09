@@ -20,9 +20,11 @@
 // `radio` field type in views/partials/form.hbs) and this handler will treat
 // any other choice in that input's name-group as a validation failure.
 //
-// A form can also persist a field's value as a cookie on success by setting
-// `data-save-cookie-field="<fieldName>"` on the <form> (driven by the
-// `saveToCookie` config option — see config/forms.js).
+// A form can also persist a field's value as a top-level field in the
+// shared site cookie on success by setting `data-save-cookie-field="<fieldName>"`
+// on the <form> (driven by the `saveToCookie` config option — see
+// config/forms.js). Storage goes through SiteCookie (see js/site-cookie.js)
+// so this doesn't create its own cookie.
 document.addEventListener('DOMContentLoaded', () => {
   const forms = document.querySelectorAll('form[data-js="form"]');
 
@@ -90,8 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const field = form.elements.namedItem(fieldName);
     if (!field) return;
 
-    const oneYear = 60 * 60 * 24 * 365;
-    document.cookie = `${encodeURIComponent(fieldName)}=${encodeURIComponent(field.value)}; path=/; max-age=${oneYear}`;
+    window.SiteCookie.set(fieldName, field.value);
   }
 
   function findStatusElement(form) {

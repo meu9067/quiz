@@ -27,6 +27,25 @@
           </label>
         {{/each}}
       </fieldset>
+    {{else if (eq type "image")}}
+      <fieldset class="image-choice">
+        <legend>{{label}}</legend>
+        <div class="image-choice__options">
+          {{#each options}}
+            <label class="image-choice__option">
+              <input
+                type="radio"
+                name="{{../name}}"
+                value="{{this.value}}"
+                {{#if ../required}}required{{/if}}
+                {{#if this.correct}}data-correct="true"{{/if}}
+              />
+              <img class="image-choice__img" src="{{this.image}}" alt="{{this.label}}" />
+              <span class="image-choice__label">{{this.label}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </fieldset>
     {{else}}
       <label>
         {{label}}
