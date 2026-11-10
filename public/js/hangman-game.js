@@ -40,12 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
     '/images/hangman/PAPI-5.png',
   ];
 
+  // Keep in sync with the CSS duration for `.is-last-chance` (glimmer) in
+  // scss/components/_hangman-game.scss.
+  const JEWEL_GLIMMER_MS = 900;
+
   games.forEach((game) => {
     const word = (game.dataset.hangmanWord || '').trim().toUpperCase();
     const wordDisplay = game.querySelector('[data-hangman-word-display]');
     const keyboard = game.querySelector('[data-hangman-keyboard]');
     const status = game.querySelector('[data-hangman-status]');
     const image = game.querySelector('[data-hangman-image]');
+    const jewel = game.querySelector('[data-hangman-jewel]');
     if (!word || !wordDisplay || !keyboard) return;
 
     const maxMistakes = parseInt(game.dataset.hangmanMaxMistakes, 10) || 4;
@@ -99,11 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         btn.classList.add('is-wrong');
         mistakes += 1;
-        setImage(mistakes);
 
         if (mistakes >= maxMistakes) {
-          onLose();
+          disableKeyboard();
+          playLossSequence();
         } else {
+          setImage(mistakes);
           setStatus(`${maxMistakes - mistakes} chances left.`);
         }
       }
@@ -144,6 +150,23 @@ document.addEventListener('DOMContentLoaded', () => {
       disableKeyboard();
       window.SiteCookie.setGame(storageKey, { date: todaySlug(), failed: true });
       game.dispatchEvent(new CustomEvent('hangman-game:lost', { bubbles: true }));
+    }
+
+    // Plays the glimmer on the jewel at the same moment the final stage
+    // image appears, then wraps up the loss once the glimmer finishes.
+    function playLossSequence() {
+      setImage(mistakes);
+
+      if (jewel) {
+        jewel.classList.add('is-last-chance');
+      }
+
+      window.setTimeout(() => {
+        if (jewel) {
+          jewel.classList.remove('is-last-chance');
+        }
+        onLose();
+      }, JEWEL_GLIMMER_MS);
     }
 
     function disableKeyboard() {

@@ -1,26 +1,36 @@
 <section>
-  <h1>Day 11-10</h1>
-  <p>This page was generated for <strong>{{date}}</strong>.</p>
-  <p id="day-greeting"></p>
+    <h1>Day {{date}}</h1>
+    <p id="day-greeting"></p>
 </section>
 
 <section
-  data-js="hangman-game"
-  data-hangman-word="GIRAFFE"
-  data-hangman-max-mistakes="5"
-  data-hangman-storage-key="hangman-11-10"
+        data-js="hangman-game"
+        data-hangman-word="RICORE"
+        data-hangman-max-mistakes="4"
+        data-hangman-storage-key="hangman-11-10"
 >
-  <h2>Hangman</h2>
-  <p>Guess the word one letter at a time. You only get 4 wrong guesses.</p>
-  <img data-hangman-image class="hangman-image" alt="Hangman stage 0" />
-  <p class="hangman-word" data-hangman-word-display></p>
-  <div class="hangman-keyboard" data-hangman-keyboard></div>
-  <p data-hangman-status></p>
+    <p class="hangman-speach">Attention !
+        Chaque fois que tu
+        te trompes , je perds
+        un objet qui me tient
+        à coeur !</p>
+    <div class="hangman">
+        <div class="image-wrapper">
+            <span class="hangman-jewel" data-hangman-jewel aria-hidden="true"></span>
+            <img data-hangman-image class="hangman-image" alt="Hangman stage 0"/>
+        </div>
+        <div class="game-wrapper">
+            <p class="hangman-word" data-hangman-word-display></p>
+            <div class="hangman-keyboard" data-hangman-keyboard>
+
+            </div>
+            <p data-hangman-status></p>
+            <p style="color:#4a631b;">INDICE : Boisson de papi au petit déjeuner</p>
+        </div>
+    </div>
 </section>
 
 <section id="hangman-form-wrapper" hidden>
-  <h2>You guessed it! 🎉</h2>
-  {{> form formsByName.dayHangman1110}}
+    <h2>You guessed it! 🎉</h2>
+    {{> form formsByName.dayHangman1110}}
 </section>
-
-<p><a href="/">Back home</a></p>
