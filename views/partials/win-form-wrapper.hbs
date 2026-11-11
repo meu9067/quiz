@@ -1,0 +1,16 @@
+{{!--
+  Shared "win form" wrapper for day-games (hangman/memory/drop-game).
+
+  Renders the `#<id>-form-wrapper` section each game's JS looks for via
+  SiteGameUI.revealWinForm('<id>') (see public/js/site-game-ui.js) — hidden
+  until the player wins, then unhidden to reveal the gated form.
+
+  Params:
+    id       the game name used in data-js="<id>-game" (e.g. "hangman")
+    heading  heading shown once the form is revealed
+    form     the resolved form config to render (e.g. formsByName.dayHangman1110)
+--}}
+<section id="{{id}}-form-wrapper" hidden>
+  <h2>{{heading}}</h2>
+  {{> form form}}
+</section>

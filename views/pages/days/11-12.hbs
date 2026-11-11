@@ -1,0 +1,28 @@
+<section>
+  <h1>Jour {{date}}</h1>
+  <p id="day-greeting"></p>
+</section>
+
+<section
+  data-js="flappy-game"
+  data-flappy-max-losses="10"
+  data-flappy-goal-distance="2000"
+  data-flappy-storage-key="flappy-11-12"
+>
+  <h2>Vole jusqu'au drapeau</h2>
+  <p>Clique sur « Commencer », puis clique (ou appuie sur Espace/Flèche du haut) pour faire battre des ailes à l'oiseau. Survole les montagnes — les nuages ne sont que du décor — et atteins le drapeau. Tu as 3 vies.</p>
+
+  <button type="button" class="btn" data-flappy-start>Commencer</button>
+
+  <div class="flappy-field" data-flappy-field>
+    <div class="flappy-bird" data-flappy-bird style="left: 80px;">🐦</div>
+    <div class="flappy-goal" data-flappy-goal></div>
+  </div>
+
+  <p data-flappy-status></p>
+  <p data-flappy-alert hidden></p>
+</section>
+
+{{> win-form-wrapper id="flappy" heading="Tu as atteint le drapeau ! 🎉" form=formsByName.dayFlappy1112}}
+
+<p><a href="/">Retour à l'accueil</a></p>

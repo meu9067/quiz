@@ -1,0 +1,189 @@
+// Flappy-Bird-style game: viewport field, bird, and procedurally spawned
+// mountains (obstacles) and clouds (decorative only) — all built/positioned
+// by js/flappy-game.js, not markup.
+@use '../abstracts/variables' as *;
+
+.flappy-field {
+  position: relative;
+  width: 100%;
+  max-width: 840px;
+  height: 460px;
+  margin: $spacing auto;
+  overflow: hidden;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: linear-gradient(#bfe9ff, #eaffea);
+  touch-action: none;
+  cursor: pointer;
+
+  // A full-field red flash the instant a collision happens — layered on
+  // top of everything (mountains/clouds/bird all use lower z-indexes) via
+  // a pseudo-element so js/flappy-game.js doesn't need an extra DOM node
+  // just for this.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: rgba(220, 38, 38, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  &.is-hit::after {
+    opacity: 1;
+  }
+}
+
+.flappy-bird {
+  position: absolute;
+  top: 50%;
+  left: 80px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  will-change: transform, top;
+  // Flapping is just rapid clicking/tapping on the field — without this,
+  // that quickly selects the bird's emoji as text, showing the browser's
+  // blue selection highlight behind it instead of the bird staying clean.
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  &.is-hit {
+    animation: flappy-bird-hit 0.5s ease;
+  }
+}
+
+@keyframes flappy-bird-hit {
+  0%,
+  100% {
+    filter: none;
+  }
+  10%,
+  30%,
+  50%,
+  70% {
+    transform: translateX(-8px) rotate(-15deg);
+    filter: brightness(0.6) saturate(3) hue-rotate(-20deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(8px) rotate(15deg);
+    filter: brightness(0.6) saturate(3) hue-rotate(-20deg);
+  }
+}
+
+// A single triangular peak per obstacle (no gap to fly through, like the
+// old pipes) — the bird just needs enough altitude to clear its height.
+// Positioned at the field's left edge and moved entirely with a
+// `transform: translateX(...)` set by js/flappy-game.js — this keeps
+// mountains, clouds, and the bird on the same coordinate system
+// (screen-space x), separate from the world-space `distance` the game
+// tracks internally.
+.flappy-mountain {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 70px; // keep in sync with MOUNTAIN_WIDTH in js/flappy-game.js
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  background: linear-gradient(180deg, #e2e8f0 0%, #8d6e63 18%, #5d4037 100%);
+}
+
+// Purely decorative, drawn behind the bird/mountains and drifting past
+// slower than them (see CLOUD_PARALLAX in js/flappy-game.js) for a bit of
+// background depth — never involved in collision checks.
+.flappy-cloud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  height: 36px;
+  background: #fff;
+  border-radius: 50px;
+  opacity: 0.9;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  &::before {
+    width: 55%;
+    height: 140%;
+    top: -60%;
+    left: 10%;
+  }
+
+  &::after {
+    width: 40%;
+    height: 110%;
+    top: -40%;
+    right: 10%;
+  }
+}
+
+// A finish line spanning the whole field height — clearly visible however
+// tall the field ends up, rather than just a flag floating at the top.
+// Positioned/moved the same way mountains and clouds are (see the comment
+// on .flappy-mountain above).
+.flappy-goal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  height: 100%;
+  width: 14px;
+  // Checkered racing-flag pattern, repeated vertically.
+  background:
+    linear-gradient(135deg, #111827 25%, transparent 25%) 0 0 / 14px 14px,
+    linear-gradient(-45deg, #111827 25%, transparent 25%) 0 0 / 14px 14px,
+    linear-gradient(135deg, transparent 75%, #111827 75%) 0 0 / 14px 14px,
+    linear-gradient(-45deg, transparent 75%, #111827 75%) 0 0 / 14px 14px;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
+
+  &::after {
+    content: '🏁';
+    position: absolute;
+    top: -0.5rem;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+}
+
+// A distinct, more prominent message shown once the game is over for good
+// (win or final loss) — kept separate from [data-flappy-status] so it's
+// impossible to miss, unlike the status line which just gets replaced.
+[data-flappy-alert] {
+  margin: $spacing 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  text-align: center;
+
+  &.is-lost {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 2px solid #b91c1c;
+  }
+
+  &.is-won {
+    background: #dcfce7;
+    color: #15803d;
+    border: 2px solid #15803d;
+  }
+}
