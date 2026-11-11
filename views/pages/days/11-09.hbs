@@ -1,19 +1,15 @@
 <section>
-  <h1>Day 11-09</h1>
-  <p>This page was generated for <strong>{{date}}</strong>.</p>
+  <h1>Jour {{date}}</h1>
+  <p>Cette page a été générée pour le <strong>{{date}}</strong>.</p>
   <p id="day-greeting"></p>
 </section>
 
 <section data-js="memory-game" data-memory-pairs="8">
-  <h2>Memory game</h2>
-  <p>Flip the cards and match all 8 pairs to unlock today's form.</p>
+  <h2>Jeu de mémoire</h2>
+  <p>Retourne les cartes et trouve les 8 paires pour débloquer le formulaire du jour.</p>
   <div class="memory-grid" data-memory-grid></div>
   <p data-memory-status></p>
 </section>
 
-<section id="memory-form-wrapper" hidden>
-  <h2>You matched everything! 🎉</h2>
-  {{> form formsByName.dayMemory1109}}
-</section>
+{{> win-form-wrapper id="memory" heading="Tu as trouvé toutes les paires ! 🎉" form=formsByName.dayMemory1109}}
 
-<p><a href="/">Back home</a></p>

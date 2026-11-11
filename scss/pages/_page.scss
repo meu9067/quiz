@@ -11,11 +11,6 @@ main.page {
   box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-.hero {
-  text-align: center;
-}
-
-
 h1 {
   text-align: center;
 }
@@ -23,6 +18,27 @@ h1 {
 #day-greeting {
   text-align: center;
 }
+
+// Shared status-line styling for every day-game (hangman/memory/drop-game).
+// Forms have their own richer version with success/error color states —
+// see [data-form-status] in components/_forms.scss.
+[data-hangman-status],
+[data-memory-status],
+[data-drop-status],
+[data-flappy-status] {
+  font-weight: 600;
+}
+
 h1,h2,h3,h4,h5,h6, p {
   font-family: $font-family-1;
+  text-align: center;
+}
+
+.green {
+color: #4a631b;
+}
+
+.red {
+color: #de5651;
+
 }

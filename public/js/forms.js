@@ -31,12 +31,12 @@
 // (driven by the `maxAttempts` config option — see config/forms.js). Once a
 // wrong answer has been submitted more than `maxAttempts` times, the form
 // locks: `data-lockout-message` (or `lockoutMessage` in config) is shown
-// instead of the usual error, every field is disabled, and the shared
-// SiteCookie records `{ date, failed: true }` under this form's storage
-// key (`data-quiz-storage-key`, defaulting to the form's id) — exactly like
-// js/hangman-game.js and js/drop-game.js do for their games. If that's
-// already present on load, the form renders as already locked and a page
-// refresh does not grant a new attempt.
+// instead of the usual error, every field is disabled, the whole page dims
+// (via js/site-page-fade.js, like js/hangman-game.js and js/drop-game.js do
+// on a loss), and the shared SiteCookie records `{ date, failed: true }`
+// under this form's storage key (`data-quiz-storage-key`, defaulting to the
+// form's id). If that's already present on load, the form renders as
+// already locked and a page refresh does not grant a new attempt.
 document.addEventListener('DOMContentLoaded', () => {
   const forms = document.querySelectorAll('form[data-js="form"]');
 
@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (maxAttempts && window.SiteCookie.getGame(storageKey)) {
       lockForm(form, status);
+      window.SitePageFade.fadeOut();
       return;
     }
 
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reportValidity();
         setStatus(
           status,
-          form.dataset.errorMessage || 'Please fix the highlighted fields and try again.',
+          form.dataset.errorMessage || 'Merci de corriger les champs en surbrillance et de réessayer.',
           'error'
         );
         return;
@@ -68,15 +69,16 @@ document.addEventListener('DOMContentLoaded', () => {
         wrongAttempts += 1;
 
         if (maxAttempts && wrongAttempts > maxAttempts) {
-          window.SiteCookie.setGame(storageKey, { date: todaySlug(), failed: true });
+          window.SiteCookie.setGame(storageKey, { date: window.SiteDate.todaySlug(), failed: true });
           lockForm(form, status);
+          window.SitePageFade.fadeOut();
           form.dispatchEvent(new CustomEvent('form:locked', { bubbles: true, detail: { form } }));
           return;
         }
 
         setStatus(
           status,
-          form.dataset.errorMessage || 'That answer is not quite right — try again.',
+          form.dataset.errorMessage || 'Cette réponse n\'est pas tout à fait bonne — réessaie.',
           'error'
         );
         return;
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       setStatus(
         status,
-        form.dataset.successMessage || 'Thanks! Your submission has been received.',
+        form.dataset.successMessage || 'Merci ! Ta soumission a bien été reçue.',
         'success'
       );
       form.reset();
@@ -102,22 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function lockForm(form, status) {
     setStatus(
       status,
-      form.dataset.lockoutMessage || "You've used up your attempt — come back another day to try again.",
+      form.dataset.lockoutMessage || "Tu as utilisé ta tentative — reviens un autre jour pour réessayer.",
       'error'
     );
     [...form.elements].forEach((field) => {
       field.disabled = true;
     });
-  }
-
-  // Mirrors the override read by js/main.js so a form locked "today" stays
-  // locked for the same overridden day during testing.
-  function todaySlug() {
-    const override = document.body.dataset.testDateOverride;
-    const date = override ? new Date(`${override}T00:00:00`) : new Date();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${month}-${day}`;
   }
 
   function hasCorrectAnswers(form) {

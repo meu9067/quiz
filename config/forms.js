@@ -55,10 +55,10 @@ function quiz(fieldType) {
     options,
     storageKey,
     maxAttempts = 1,
-    submitLabel = 'Submit answer',
-    successMessage = 'Correct! Nicely done.',
-    errorMessage = 'Not quite — give it another go.',
-    lockoutMessage = "You've used up your attempt for today — come back another day to try again.",
+    submitLabel = 'Valider la réponse',
+    successMessage = 'Correct ! Bien joué.',
+    errorMessage = 'Pas tout à fait — retente ta chance.',
+    lockoutMessage = "Tu as utilisé ta tentative pour aujourd'hui — reviens un autre jour pour réessayer.",
   }) => ({
     page,
     submitLabel,
@@ -68,7 +68,9 @@ function quiz(fieldType) {
     lockoutMessage,
     // Keyed by page so the same question reused on two different pages
     // doesn't share a lockout — see data-quiz-storage-key in js/forms.js.
-    quizStorageKey: storageKey || `${fieldType}-quiz-${page}`,
+    // Follows the same `<game>-<date>` scheme used by js/hangman-game.js
+    // and js/drop-game.js's storage keys.
+    quizStorageKey: storageKey || `quiz-${page}`,
     fields: [
       {
         name: 'choice',
@@ -87,91 +89,91 @@ const imageQuiz = quiz('image');
 module.exports = {
   contact: {
     page: 'contact',
-    submitLabel: 'Send',
-    successMessage: 'Thanks! Your message has been sent.',
-    errorMessage: 'Please fill in your name and a message before sending.',
+    submitLabel: 'Envoyer',
+    successMessage: 'Merci ! Ton message a été envoyé.',
+    errorMessage: 'Merci de renseigner ton nom et un message avant d\'envoyer.',
     fields: [
-      { name: 'name', label: 'Name', type: 'text', required: true, minlength: 2 },
-      { name: 'email', label: 'Email', type: 'email', required: true },
+      { name: 'name', label: 'Nom', type: 'text', required: true, minlength: 2 },
+      { name: 'email', label: 'E-mail', type: 'email', required: true },
       { name: 'message', label: 'Message', type: 'textarea', rows: 4, required: true },
     ],
   },
 
   newsletter: {
     page: 'home',
-    submitLabel: 'Subscribe',
-    successMessage: "You're subscribed! Check your inbox for a confirmation.",
-    errorMessage: 'Please enter a valid email address.',
-    fields: [{ name: 'email', label: 'Email', type: 'email', required: true }],
+    submitLabel: "S'abonner",
+    successMessage: 'Tu es abonné(e) ! Vérifie ta boîte mail pour confirmer.',
+    errorMessage: 'Merci de saisir une adresse e-mail valide.',
+    fields: [{ name: 'email', label: 'E-mail', type: 'email', required: true }],
   },
 
   nameForm: {
     page: 'home',
-    submitLabel: 'Save',
-    successMessage: 'Thanks! We will remember your name.',
-    errorMessage: "Please enter your name.",
+    submitLabel: 'Enregistrer',
+    successMessage: 'Merci ! Nous retiendrons ton prénom.',
+    errorMessage: "Merci de saisir ton prénom.",
     // Stores the given field's value in a cookie of the same name once the
     // form succeeds — see `saveToCookie` handling in js/forms.js.
     saveToCookie: 'name',
-    fields: [{ name: 'name', label: "What's your name?", type: 'text', required: true, minlength: 1 }],
+    fields: [{ name: 'name', label: "Quel est ton prénom ?", type: 'text', required: true, minlength: 1 }],
   },
 
   signup: {
     page: 'signup',
-    submitLabel: 'Create account',
-    successMessage: 'Welcome aboard! Your account has been created.',
-    errorMessage: 'Please check the highlighted fields — passwords must match and be at least 8 characters.',
+    submitLabel: 'Créer le compte',
+    successMessage: 'Bienvenue ! Ton compte a été créé.',
+    errorMessage: 'Merci de vérifier les champs en surbrillance — les mots de passe doivent correspondre et contenir au moins 8 caractères.',
     fields: [
-      { name: 'fullName', label: 'Full name', type: 'text', required: true, minlength: 2 },
-      { name: 'email', label: 'Email', type: 'email', required: true },
-      { name: 'password', label: 'Password', type: 'password', required: true, minlength: 8 },
-      { name: 'confirmPassword', label: 'Confirm password', type: 'password', required: true, minlength: 8 },
-      { name: 'terms', label: 'I agree to the terms and conditions', type: 'checkbox', required: true },
+      { name: 'fullName', label: 'Nom complet', type: 'text', required: true, minlength: 2 },
+      { name: 'email', label: 'E-mail', type: 'email', required: true },
+      { name: 'password', label: 'Mot de passe', type: 'password', required: true, minlength: 8 },
+      { name: 'confirmPassword', label: 'Confirmer le mot de passe', type: 'password', required: true, minlength: 8 },
+      { name: 'terms', label: "J'accepte les conditions générales", type: 'checkbox', required: true },
     ],
   },
 
   feedback: {
     page: 'feedback',
-    submitLabel: 'Submit feedback',
-    successMessage: 'Thank you for your feedback!',
-    errorMessage: 'Please select a rating and add a comment.',
+    submitLabel: "Envoyer l'avis",
+    successMessage: 'Merci pour ton avis !',
+    errorMessage: 'Merci de choisir une note et d\'ajouter un commentaire.',
     fields: [
       {
         name: 'rating',
-        label: 'How would you rate your experience?',
+        label: 'Comment évaluerais-tu ton expérience ?',
         type: 'select',
         required: true,
-        placeholder: 'Select a rating',
+        placeholder: 'Choisis une note',
         options: [
           { value: '5', label: 'Excellent' },
-          { value: '4', label: 'Good' },
-          { value: '3', label: 'Average' },
-          { value: '2', label: 'Poor' },
-          { value: '1', label: 'Very poor' },
+          { value: '4', label: 'Bien' },
+          { value: '3', label: 'Moyen' },
+          { value: '2', label: 'Mauvais' },
+          { value: '1', label: 'Très mauvais' },
         ],
       },
-      { name: 'comments', label: 'Comments', type: 'textarea', rows: 4, required: true },
+      { name: 'comments', label: 'Commentaires', type: 'textarea', rows: 4, required: true },
     ],
   },
 
   booking: {
     page: 'booking',
-    submitLabel: 'Book now',
-    successMessage: 'Your booking request has been received — we will confirm shortly.',
-    errorMessage: 'Please fill in your phone number and number of guests.',
+    submitLabel: 'Réserver',
+    successMessage: 'Ta demande de réservation a été reçue — nous te confirmerons bientôt.',
+    errorMessage: 'Merci de renseigner ton numéro de téléphone et le nombre de convives.',
     fields: [
-      { name: 'fullName', label: 'Full name', type: 'text', required: true, minlength: 2 },
-      { name: 'phone', label: 'Phone number', type: 'tel', required: true, pattern: '[0-9+ ]{7,15}' },
-      { name: 'guests', label: 'Number of guests', type: 'number', required: true, min: 1, max: 20 },
-      { name: 'notes', label: 'Special requests', type: 'textarea', rows: 3 },
+      { name: 'fullName', label: 'Nom complet', type: 'text', required: true, minlength: 2 },
+      { name: 'phone', label: 'Numéro de téléphone', type: 'tel', required: true, pattern: '[0-9+ ]{7,15}' },
+      { name: 'guests', label: 'Nombre de convives', type: 'number', required: true, min: 1, max: 20 },
+      { name: 'notes', label: 'Demandes spéciales', type: 'textarea', rows: 3 },
     ],
   },
 
   quiz: radioQuiz({
     page: 'quiz',
-    question: 'Which option is correct?',
-    successMessage: "Correct! That's the one.",
-    errorMessage: 'Not quite — pick the middle option.',
+    question: 'Quelle option est correcte ?',
+    successMessage: "Correct ! C'est la bonne.",
+    errorMessage: "Pas tout à fait — choisis l'option du milieu.",
     options: [
       { value: 'a', label: 'Option A' },
       { value: 'b', label: 'Option B', correct: true },
@@ -184,8 +186,8 @@ module.exports = {
   // matching how server.js groups forms by page.
   dayQuiz1107: radioQuiz({
     page: '11-07',
-    question: 'What is 2 + 2?',
-    successMessage: "Correct! You nailed today's quiz.",
+    question: 'Combien font 2 + 2 ?',
+    successMessage: "Correct ! Tu as réussi le quiz du jour.",
     options: [
       { value: 'a', label: '3' },
       { value: 'b', label: '4', correct: true },
@@ -195,9 +197,9 @@ module.exports = {
 
   dayQuiz1108: radioQuiz({
     page: '11-08',
-    question: 'Which planet is known as the Red Planet?',
+    question: 'Quelle planète est surnommée la planète rouge ?',
     options: [
-      { value: 'a', label: 'Venus' },
+      { value: 'a', label: 'Vénus' },
       { value: 'b', label: 'Mars', correct: true },
       { value: 'c', label: 'Jupiter' },
     ],
@@ -218,10 +220,10 @@ module.exports = {
   // wrapping this form after all 8 pairs are matched.
   dayMemory1109: {
     page: '11-09',
-    submitLabel: 'Claim your win',
-    successMessage: 'Nicely played — your win has been recorded!',
-    errorMessage: 'Please enter your name to claim your win.',
-    fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
+    submitLabel: 'Réclamer ta victoire',
+    successMessage: 'Bien joué — ta victoire a été enregistrée !',
+    errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
+    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
   },
 
   // Unlocked once the hangman game on this day's page is won — see
@@ -229,10 +231,10 @@ module.exports = {
   // wrapping this form once the word is fully guessed.
   dayHangman1110: {
     page: '11-10',
-    submitLabel: 'Claim your win',
-    successMessage: 'Nicely guessed — your win has been recorded!',
-    errorMessage: 'Please enter your name to claim your win.',
-    fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
+    submitLabel: 'Réclamer ta victoire',
+    successMessage: 'Bien deviné — ta victoire a été enregistrée !',
+    errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
+    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
   },
 
   // Unlocked once the drag-and-drop game on this day's page is won — see
@@ -240,9 +242,20 @@ module.exports = {
   // this form once all 5 valid objects have been dropped in the box.
   dayDrop1111: {
     page: '11-11',
-    submitLabel: 'Claim your win',
-    successMessage: 'Great sorting — your win has been recorded!',
-    errorMessage: 'Please enter your name to claim your win.',
-    fields: [{ name: 'playerName', label: 'Your name', type: 'text', required: true, minlength: 1 }],
+    submitLabel: 'Réclamer ta victoire',
+    successMessage: 'Bien trié — ta victoire a été enregistrée !',
+    errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
+    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
+  },
+
+  // Unlocked once the flappy-bird game on this day's page is won — see
+  // js/flappy-game.js, which reveals the `#flappy-form-wrapper` element
+  // wrapping this form once the goal/finish line is reached.
+  dayFlappy1112: {
+    page: '11-12',
+    submitLabel: 'Réclamer ta victoire',
+    successMessage: 'Bien volé — ta victoire a été enregistrée !',
+    errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
+    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
   },
 };

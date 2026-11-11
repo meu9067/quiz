@@ -1,6 +1,5 @@
 <section>
-  <h1>Day 11-11</h1>
-  <p>This page was generated for <strong>{{date}}</strong>.</p>
+  <h1>Jour {{date}}</h1>
   <p id="day-greeting"></p>
 </section>
 
@@ -9,30 +8,27 @@
   data-drop-max-mistakes="3"
   data-drop-storage-key="drop-11-11"
 >
-  <h2>Sort the fruit</h2>
-  <p>Drag the 5 pieces of fruit into the basket. You only get 3 wrong drops.</p>
+  <h2 class="green">Remplis le sac de papi avec les choses qu’il avait toujours sur lui.
+  </h2>
+  <p class="red">Attention ! Si tu te trompes plus de deux fois, tu perds le mot du jour...</p>
 
   <div class="drop-field" data-drop-field>
-    <div class="drop-box" data-drop-target>Basket</div>
+    <div class="drop-box" data-drop-target><img src="/images/sac/sac0.png"></div>
 
-    <div id="drop-obj-1" class="drop-object" data-drop-object data-drop-valid="true" style="left: 90%; top: 50%;">🍎</div>
-    <div id="drop-obj-2" class="drop-object" data-drop-object data-drop-valid="false" style="left: 82.4%; top: 73.5%;">🔧</div>
-    <div id="drop-obj-3" class="drop-object" data-drop-object data-drop-valid="true" style="left: 62.4%; top: 88%;">🍌</div>
-    <div id="drop-obj-4" class="drop-object" data-drop-object data-drop-valid="false" style="left: 37.6%; top: 88%;">⚽</div>
-    <div id="drop-obj-5" class="drop-object" data-drop-object data-drop-valid="true" style="left: 17.6%; top: 73.5%;">🍇</div>
-    <div id="drop-obj-6" class="drop-object" data-drop-object data-drop-valid="false" style="left: 10%; top: 50%;">📚</div>
-    <div id="drop-obj-7" class="drop-object" data-drop-object data-drop-valid="true" style="left: 17.6%; top: 26.5%;">🍉</div>
-    <div id="drop-obj-8" class="drop-object" data-drop-object data-drop-valid="false" style="left: 37.6%; top: 12%;">🎸</div>
-    <div id="drop-obj-9" class="drop-object" data-drop-object data-drop-valid="true" style="left: 62.4%; top: 12%;">🍒</div>
-    <div id="drop-obj-10" class="drop-object" data-drop-object data-drop-valid="false" style="left: 82.4%; top: 26.5%;">🕶️</div>
+    <div id="drop-obj-1" class="drop-object" data-drop-object data-drop-valid="true"><img src="/images/sac/sac1.png"></div>
+    <div id="drop-obj-2" class="drop-object" data-drop-object data-drop-valid="false"><img src="/images/sac/sac2.png"></div>
+    <div id="drop-obj-3" class="drop-object" data-drop-object data-drop-valid="true"><img src="/images/sac/sac3.png"></div>
+    <div id="drop-obj-4" class="drop-object" data-drop-object data-drop-valid="false"><img src="/images/sac/sac4.png"></div>
+    <div id="drop-obj-5" class="drop-object" data-drop-object data-drop-valid="true"><img src="/images/sac/sac5.png"></div>
+    <div id="drop-obj-6" class="drop-object" data-drop-object data-drop-valid="true"><img src="/images/sac/sac6.png"></div>
+    <div id="drop-obj-7" class="drop-object" data-drop-object data-drop-valid="false"><img src="/images/sac/sac7.png"></div>
+    <div id="drop-obj-8" class="drop-object" data-drop-object data-drop-valid="true"><img src="/images/sac/sac8.png"></div>
+
   </div>
 
   <p data-drop-status></p>
 </section>
 
-<section id="drop-form-wrapper" hidden>
-  <h2>You sorted them all! 🎉</h2>
-  {{> form formsByName.dayDrop1111}}
-</section>
+{{> win-form-wrapper id="drop" heading="Tu as tout trié ! 🎉" form=formsByName.dayDrop1111}}
 
-<p><a href="/">Back home</a></p>
+crea

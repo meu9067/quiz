@@ -5,3 +5,4 @@ public/css/main.css.map
 dist/
 .wrangler/
 .env
+.idea/

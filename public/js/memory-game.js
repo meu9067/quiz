@@ -37,14 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     grid.innerHTML = '';
     deck.forEach((value) => grid.appendChild(createCard(value)));
-    setStatus(`0 / ${pairCount} pairs matched`);
+    setStatus(`0 / ${pairCount} paires trouvées`);
 
     function createCard(value) {
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'memory-card';
       card.dataset.value = value;
-      card.setAttribute('aria-label', 'Memory card, face down');
+      card.setAttribute('aria-label', 'Carte mémoire, face cachée');
       card.innerHTML = `
         <span class="memory-card__face memory-card__face--back" aria-hidden="true">?</span>
         <span class="memory-card__face memory-card__face--front" aria-hidden="true">${value}</span>
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstCard.classList.add('is-matched');
         secondCard.classList.add('is-matched');
         matchedCount += 1;
-        setStatus(`${matchedCount} / ${pairCount} pairs matched`);
+        setStatus(`${matchedCount} / ${pairCount} paires trouvées`);
         resetTurn();
 
         if (matchedCount === pairCount) {
@@ -92,12 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function onWin() {
-      setStatus(`You matched all ${pairCount} pairs! 🎉`);
+      setStatus(`Tu as trouvé les ${pairCount} paires ! 🎉`);
 
-      const formWrapper = document.getElementById('memory-form-wrapper');
-      if (formWrapper) {
-        formWrapper.hidden = false;
-      }
+      window.SiteGameUI.revealWinForm('memory');
 
       game.dispatchEvent(new CustomEvent('memory-game:won', { bubbles: true }));
     }

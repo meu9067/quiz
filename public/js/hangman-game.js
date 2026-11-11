@@ -16,7 +16,10 @@
 //   data-hangman-max-mistakes   number of wrong guesses allowed (default 4)
 //   data-hangman-storage-key    key used to remember a loss so a page
 //                               refresh can't be used to retry (defaults to
-//                               `hangman-<word>`) — stored via the shared
+//                               `hangman-<path>`, derived from the URL,
+//                               matching the `<game>-<date>` scheme used by
+//                               js/drop-game.js and the day-quiz forms in
+//                               config/forms.js) — stored via the shared
 //                               SiteCookie (see js/site-cookie.js), so this
 //                               game's result lives alongside every other
 //                               field in the site's one cookie.
@@ -54,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!word || !wordDisplay || !keyboard) return;
 
     const maxMistakes = parseInt(game.dataset.hangmanMaxMistakes, 10) || 4;
-    const storageKey = game.dataset.hangmanStorageKey || `hangman-${word}`;
+    const storageKey = game.dataset.hangmanStorageKey || `hangman-${location.pathname}`;
 
     const guessed = new Set();
     let mistakes = 0;
@@ -67,13 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
       over = true;
       revealWord();
       setImage(maxMistakes);
-      setStatus(`You already lost this game — the word was "${word}". Come back another day to try again.`);
+      setStatus(`Tu as déjà perdu cette partie — le mot était « ${word} ». Reviens un autre jour pour réessayer.`);
       disableKeyboard();
+      window.SitePageFade.fadeOut();
       return;
     }
 
     renderWord();
-    setStatus(`${maxMistakes} chances left.`);
+    setStatus(`${maxMistakes} chances restantes.`);
     setImage(0);
 
     function buildKeyboard() {
@@ -110,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
           playLossSequence();
         } else {
           setImage(mistakes);
-          setStatus(`${maxMistakes - mistakes} chances left.`);
+          setStatus(`${maxMistakes - mistakes} chances restantes.`);
         }
       }
     }
@@ -132,13 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function onWin() {
       over = true;
-      setStatus('You win! 🎉');
+      setStatus('Tu as gagné ! 🎉');
       disableKeyboard();
 
-      const formWrapper = document.getElementById('hangman-form-wrapper');
-      if (formWrapper) {
-        formWrapper.hidden = false;
-      }
+      window.SiteGameUI.revealWinForm('hangman');
 
       game.dispatchEvent(new CustomEvent('hangman-game:won', { bubbles: true }));
     }
@@ -146,9 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function onLose() {
       over = true;
       revealWord();
-      setStatus(`You lost! The word was "${word}".`);
+      setStatus(`Perdu ! Le mot était « ${word} ».`);
       disableKeyboard();
-      window.SiteCookie.setGame(storageKey, { date: todaySlug(), failed: true });
+      window.SiteCookie.setGame(storageKey, { date: window.SiteDate.todaySlug(), failed: true });
+      window.SitePageFade.fadeOut();
       game.dispatchEvent(new CustomEvent('hangman-game:lost', { bubbles: true }));
     }
 
@@ -178,21 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function setImage(stage) {
       if (!image) return;
       image.src = STAGE_IMAGES[Math.min(stage, STAGE_IMAGES.length - 1)];
-      image.alt = `Hangman stage ${stage} of ${maxMistakes}`;
+      image.alt = `Étape ${stage} sur ${maxMistakes} du pendu`;
     }
 
     function setStatus(message) {
       if (status) status.textContent = message;
     }
   });
-
-  // Mirrors the override read by js/main.js so a game lost "today" stays
-  // lost for the same overridden day during testing.
-  function todaySlug() {
-    const override = document.body.dataset.testDateOverride;
-    const date = override ? new Date(`${override}T00:00:00`) : new Date();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${month}-${day}`;
-  }
 });

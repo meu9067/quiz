@@ -16,6 +16,12 @@
 //                          data-drop-valid="true" | "false"
 //   data-drop-status     status text (success / fail / win / lose)
 //
+// Objects don't need a position baked into the page markup — they're laid
+// out on load by `positionObjects()`, which spreads them evenly around a
+// circle (with a little randomized jitter) inside the field. This keeps the
+// page template free of hand-picked left/top coordinates and lets any
+// number of objects be declared.
+//
 // Each object is given a randomized float speed, delay and bob height on
 // load (via --float-duration/--float-delay/--float-distance CSS custom
 // properties, consumed by the `drop-object-float` keyframes in main.scss)
@@ -25,11 +31,13 @@
 //   data-drop-max-mistakes   wrong drops allowed before losing (default 3)
 //   data-drop-storage-key    key used to remember a loss so a page refresh
 //                            can't be used to retry (defaults to
-//                            `drop-game-<pageName>`, derived from the URL)
-//                            — stored via the shared SiteCookie (see
-//                            js/site-cookie.js), so this game's result lives
-//                            alongside every other field in the site's one
-//                            cookie.
+//                            `drop-<path>`, derived from the URL, matching
+//                            the `<game>-<date>` scheme used by
+//                            js/hangman-game.js and the day-quiz forms in
+//                            config/forms.js) — stored via the shared
+//                            SiteCookie (see js/site-cookie.js), so this
+//                            game's result lives alongside every other
+//                            field in the site's one cookie.
 //
 // On a win (every valid object dropped), this shows `#drop-form-wrapper`
 // (if present on the page) — the same way js/memory-game.js and
@@ -50,13 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!field || !target || objects.length === 0) return;
 
     const maxMistakes = parseInt(game.dataset.dropMaxMistakes, 10) || 3;
-    const storageKey = game.dataset.dropStorageKey || `drop-game-${location.pathname}`;
+    const storageKey = game.dataset.dropStorageKey || `drop-${location.pathname}`;
     const totalValid = objects.filter((obj) => obj.dataset.dropValid === 'true').length;
 
     let matched = 0;
     let mistakes = 0;
     let over = false;
     let drag = null; // { obj, pointerId, offsetX, offsetY }
+
+    shuffle(objects);
+    positionObjects(field, objects);
 
     objects.forEach((obj) => {
       // Remember where it started so a wrong drop on the box can bounce
@@ -75,11 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.SiteCookie.getGame(storageKey)) {
       over = true;
       lockObjects();
-      setStatus('You already lost this game — come back another day to try again.');
+      setStatus('Tu as déjà perdu cette partie — reviens un autre jour pour réessayer.');
+      window.SitePageFade.fadeOut();
       return;
     }
 
-    setStatus(`Drag the ${totalValid} valid objects onto the box. ${maxMistakes} mistakes allowed.`);
+    setStatus(`Fais glisser les ${totalValid} bons objets dans la boîte. ${maxMistakes} erreurs autorisées.`);
 
     function onPointerDown(event) {
       const obj = event.currentTarget;
@@ -154,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function onCorrect(obj) {
       obj.classList.add('is-correct');
       matched += 1;
-      setStatus(`Correct! ${matched} / ${totalValid} found.`);
+      setStatus(`Correct ! ${matched} / ${totalValid} trouvés.`);
 
       if (matched === totalValid) {
         onWin();
@@ -166,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
       obj.classList.add('is-wrong', 'is-returning');
       obj.style.left = obj.dataset.homeLeft;
       obj.style.top = obj.dataset.homeTop;
-      setStatus(`Not one of them — back it goes. ${Math.max(maxMistakes - mistakes, 0)} mistakes left.`);
+      setStatus(`Ce n'est pas le bon — il repart à sa place. ${Math.max(maxMistakes - mistakes, 0)} erreurs restantes.`);
       setTimeout(() => obj.classList.remove('is-wrong', 'is-returning'), 400);
 
       if (mistakes >= maxMistakes) {
@@ -176,22 +188,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function onWin() {
       over = true;
-      setStatus('You found every valid object! 🎉');
+      setStatus('Tu as trouvé tous les bons objets ! 🎉');
       lockObjects();
 
-      const formWrapper = document.getElementById('drop-form-wrapper');
-      if (formWrapper) {
-        formWrapper.hidden = false;
-      }
+      window.SiteGameUI.revealWinForm('drop');
 
       game.dispatchEvent(new CustomEvent('drop-game:won', { bubbles: true }));
     }
 
     function onLose() {
       over = true;
-      setStatus(`Out of chances — you lost this time.`);
+      setStatus(`Plus de chances — tu as perdu cette fois-ci.`);
       lockObjects();
-      window.SiteCookie.setGame(storageKey, { date: todaySlug(), failed: true });
+      window.SiteCookie.setGame(storageKey, { date: window.SiteDate.todaySlug(), failed: true });
+      window.SitePageFade.fadeOut();
       game.dispatchEvent(new CustomEvent('drop-game:lost', { bubbles: true }));
     }
 
@@ -207,6 +217,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Fisher-Yates shuffle, done in place — randomizes which object ends up
+  // at which position so the same page doesn't always lay objects out in
+  // the same spots relative to their markup order.
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Spreads the objects evenly around a circle centered in the field, with
+  // a little random jitter so they don't look mechanically uniform. Any
+  // object that already has an explicit inline position (left/top set in
+  // the markup) is left untouched. Positions are computed in pixels and
+  // clamped against the field's actual size (minus the object's own width/
+  // height) so objects never land partly outside the field, however big
+  // the field or the objects turn out to be.
+  function positionObjects(field, objects) {
+    const fieldRect = field.getBoundingClientRect();
+    const centerX = fieldRect.width / 2;
+    const centerY = fieldRect.height / 2;
+    const radiusX = fieldRect.width * 0.4;
+    const radiusY = fieldRect.height * 0.38;
+    const count = objects.length;
+
+    objects.forEach((obj, index) => {
+      if (obj.style.left || obj.style.top) return;
+
+      const objRect = obj.getBoundingClientRect();
+      const halfWidth = objRect.width / 2;
+      const halfHeight = objRect.height / 2;
+
+      const angle = (index / count) * 2 * Math.PI;
+      const jitter = (Math.random() - 0.5) * (2 * Math.PI) / count * 0.4;
+
+      let left = centerX + radiusX * Math.sin(angle + jitter) - halfWidth;
+      let top = centerY - radiusY * Math.cos(angle + jitter) - halfHeight;
+
+      // Keep the whole object (not just its left/top anchor point) inside
+      // the field's bounds.
+      left = Math.max(0, Math.min(left, fieldRect.width - objRect.width));
+      top = Math.max(0, Math.min(top, fieldRect.height - objRect.height));
+
+      obj.style.left = `${((left / fieldRect.width) * 100).toFixed(1)}%`;
+      obj.style.top = `${((top / fieldRect.height) * 100).toFixed(1)}%`;
+    });
+  }
+
   // Gives each object its own bob speed, delay and height so a group of
   // them doesn't float up and down in lockstep — driven by CSS custom
   // properties consumed by the `drop-object-float` keyframes in main.scss.
@@ -217,13 +276,5 @@ document.addEventListener('DOMContentLoaded', () => {
     obj.style.setProperty('--float-duration', `${duration}s`);
     obj.style.setProperty('--float-delay', `${delay}s`);
     obj.style.setProperty('--float-distance', `${distance}px`);
-  }
-
-  function todaySlug() {
-    const override = document.body.dataset.testDateOverride;
-    const date = override ? new Date(`${override}T00:00:00`) : new Date();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${month}-${day}`;
   }
 });

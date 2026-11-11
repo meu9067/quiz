@@ -34,7 +34,7 @@ test("the actual current day's page renders its real content", async () => {
 
   assert.equal(status, 200);
   assert.match(body, new RegExp(todaySlug));
-  assert.doesNotMatch(body, /Page not available/);
+  assert.doesNotMatch(body, /Page non disponible/);
 });
 
 test("a different day's existing page is reported unavailable when visited directly", async () => {
@@ -46,7 +46,7 @@ test("a different day's existing page is reported unavailable when visited direc
   const { status, body } = await get(`/day/${otherSlug}`);
 
   assert.equal(status, 404);
-  assert.match(body, /Page not available/);
+  assert.match(body, /Page non disponible/);
   assert.match(body, new RegExp(otherSlug));
 });
 
@@ -54,7 +54,7 @@ test('a date with no page file at all is also reported unavailable', async () =>
   const { status, body } = await get('/day/1999-01-01');
 
   assert.equal(status, 404);
-  assert.match(body, /Page not available/);
+  assert.match(body, /Page non disponible/);
 });
 
 test("home page's data-test-date-override attribute reflects TEST_DATE_OVERRIDE", async () => {

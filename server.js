@@ -79,6 +79,24 @@ function getPageNames() {
 
 const pageNames = getPageNames();
 
+// French titles for the auto-routed pages in views/pages — keyed by the
+// page's filename (same key used for its route). Falls back to simply
+// capitalizing the filename for any page added without an entry here.
+const PAGE_TITLES = {
+  home: 'Accueil',
+  about: 'À propos',
+  contact: 'Contact',
+  booking: 'Réservation',
+  feedback: 'Avis',
+  signup: 'Inscription',
+  quiz: 'Quiz',
+  days: 'Tous les jours',
+};
+
+function pageTitle(name) {
+  return PAGE_TITLES[name] || name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 // --- A real page per day, under views/pages/days ---
 // Each day gets its own actual .hbs file, e.g. views/pages/days/11-06.hbs
 // -> routed to /day/11-06, the same way views/pages are routed.
@@ -87,10 +105,10 @@ const pageNames = getPageNames();
 // day is backed by a real, inspectable template rather than one generic
 // catch-all view.
 const DAY_PAGE_TEMPLATE = `<section>
-  <h1>Today's page</h1>
-  <p>This page was generated for <strong>{{date}}</strong>.</p>
+  <h1>La page du jour</h1>
+  <p>Cette page a été générée pour le <strong>{{date}}</strong>.</p>
   <p id="day-greeting"></p>
-  <p><a href="/">Back home</a></p>
+  <p><a href="/">Retour à l'accueil</a></p>
 </section>
 `;
 
@@ -124,7 +142,7 @@ pageNames.forEach((name) => {
 
   app.get(routePath, (req, res) => {
     res.render(`pages/${name}`, {
-      title: name.charAt(0).toUpperCase() + name.slice(1),
+      title: pageTitle(name),
       pageName: name,
       pages: pageNames, // handy for building nav links in header partial
       days: dayPageNames, // all day pages that exist on disk, so this list stays in sync automatically
@@ -155,14 +173,14 @@ dayPageNames.forEach((dateSlug) => {
     const skipDateCheck = req.query?.date === 'true';
     if (!skipDateCheck && dateSlug !== formatDateSlug(getCurrentDate())) {
       return res.status(404).render('day-unavailable', {
-        title: 'Page not available',
+        title: 'Page non disponible',
         pages: pageNames,
         date: dateSlug,
       });
     }
 
     res.render(`pages/days/${dateSlug}`, {
-      title: `Day ${dateSlug}`,
+      title: `Jour ${dateSlug}`,
       pageName: 'day',
       pages: pageNames,
       date: dateSlug,
@@ -175,7 +193,7 @@ dayPageNames.forEach((dateSlug) => {
 // Any date that doesn't have a real page file yet is simply not available.
 app.get('/day/:date', (req, res) => {
   res.status(404).render('day-unavailable', {
-    title: 'Page not available',
+    title: 'Page non disponible',
     pages: pageNames,
     date: req.params.date,
   });
@@ -184,7 +202,7 @@ app.get('/day/:date', (req, res) => {
 // --- 404 handler ---
 app.use((req, res) => {
   res.status(404).render('pages/404', {
-    title: 'Not Found',
+    title: 'Introuvable',
     pages: pageNames,
   });
 });

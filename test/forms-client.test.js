@@ -9,13 +9,22 @@ const SITE_COOKIE_JS = fs.readFileSync(
   path.join(__dirname, '..', 'public', 'js', 'site-cookie.js'),
   'utf8'
 );
+const SITE_PAGE_FADE_JS = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'js', 'site-page-fade.js'),
+  'utf8'
+);
+const SITE_DATE_JS = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'js', 'site-date.js'),
+  'utf8'
+);
 
 // Builds a fresh document containing the given form markup plus the real
-// public/js/site-cookie.js and public/js/forms.js (inlined, so it runs
-// through the DOM/event lifecycle exactly like it does in a browser —
-// including waiting for DOMContentLoaded before wiring up listeners).
+// public/js/site-cookie.js, public/js/site-date.js, public/js/site-page-fade.js
+// and public/js/forms.js (inlined, so it runs through the DOM/event
+// lifecycle exactly like it does in a browser — including waiting for
+// DOMContentLoaded before wiring up listeners).
 async function renderForm(formHtml) {
-  const html = `<!DOCTYPE html><html><body>${formHtml}<script>${SITE_COOKIE_JS}</script><script>${FORMS_JS}</script></body></html>`;
+  const html = `<!DOCTYPE html><html><body>${formHtml}<script>${SITE_COOKIE_JS}</script><script>${SITE_DATE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${FORMS_JS}</script></body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
 
   await new Promise((resolve) => {
@@ -211,7 +220,7 @@ test('a quiz with data-max-attempts stays locked across a fresh page load once a
 
   const cookie = firstLoad.window.document.cookie;
 
-  const html = `<!DOCTYPE html><html><body>${quizMarkup()}<script>${SITE_COOKIE_JS}</script><script>${FORMS_JS}</script></body></html>`;
+  const html = `<!DOCTYPE html><html><body>${quizMarkup()}<script>${SITE_COOKIE_JS}</script><script>${SITE_DATE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${FORMS_JS}</script></body></html>`;
   const secondLoad = new (require('jsdom').JSDOM)(html, { runScripts: 'dangerously', url: 'http://localhost/' });
   secondLoad.window.document.cookie = cookie;
   await new Promise((resolve) => {

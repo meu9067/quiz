@@ -52,10 +52,10 @@
   margin: $spacing 0;
 }
 
-.image-wrapper {
+.hangman__image-wrapper {
   position: relative;
 }
-.game-wrapper {
+.hangman__game-wrapper {
   width: 500px;
   margin: 0 auto;
 }
@@ -108,9 +108,6 @@
   }
 }
 
-[data-hangman-status] {
-  font-weight: 600;
-}
 
 .hangman {
   display: flex;
