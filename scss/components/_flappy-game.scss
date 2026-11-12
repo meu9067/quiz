@@ -6,7 +6,7 @@
 .flappy-field {
   position: relative;
   width: 100%;
-  max-width: 840px;
+  max-width: 100%;
   height: 460px;
   margin: $spacing auto;
   overflow: hidden;
@@ -33,6 +33,26 @@
 
   &.is-hit::after {
     opacity: 1;
+  }
+
+  // Solid border once play has actually begun — a small, low-risk visual
+  // cue distinguishing "ready to start" (dashed) from "in progress".
+  &.is-playing {
+    border-style: solid;
+  }
+
+  .btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+  }
+
+  &.is-playing {
+    .btn {
+      display: none;
+    }
   }
 }
 
@@ -146,12 +166,7 @@
   height: 100%;
   width: 14px;
   // Checkered racing-flag pattern, repeated vertically.
-  background:
-    linear-gradient(135deg, #111827 25%, transparent 25%) 0 0 / 14px 14px,
-    linear-gradient(-45deg, #111827 25%, transparent 25%) 0 0 / 14px 14px,
-    linear-gradient(135deg, transparent 75%, #111827 75%) 0 0 / 14px 14px,
-    linear-gradient(-45deg, transparent 75%, #111827 75%) 0 0 / 14px 14px;
-  background-color: #fff;
+  background-color: #00800075;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
 
   &::after {

@@ -82,4 +82,7 @@ test('clicking the start button is required before the field reacts to a flap, t
 
   assert.equal(startButton.hidden, true);
   assert.doesNotMatch(status.textContent, /Commencer/);
+
+  const field = dom.window.document.querySelector('[data-flappy-field]');
+  assert.ok(field.classList.contains('is-playing'));
 });

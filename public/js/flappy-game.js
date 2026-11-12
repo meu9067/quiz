@@ -30,6 +30,11 @@
 // resets or the game locks for good — long enough (HIT_PAUSE_MS) to
 // actually register as a hit rather than silently resetting.
 //
+// data-flappy-field gets an `.is-playing` class the moment the run actually
+// starts (immediately if there's no start button, otherwise on that
+// button's click) — a CSS hook for anything that should only apply once
+// play has begun, e.g. hiding a "click to flap" hint.
+//
 // Optional attributes on the container:
 //   data-flappy-max-losses     collisions allowed before losing for good
 //                              (default 3) — each one short of that resets
@@ -131,12 +136,14 @@ document.addEventListener('DOMContentLoaded', () => {
         started = true;
         startButton.disabled = true;
         startButton.hidden = true;
+        field.classList.add('is-playing');
         setStatus(`Survole les montagnes et atteins le drapeau. ${maxLosses} vies.`);
         startRun();
       });
     } else {
       // No start button on the page: fall back to starting right away.
       started = true;
+      field.classList.add('is-playing');
       startRun();
     }
 
