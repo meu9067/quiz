@@ -7,4 +7,6 @@ import './memory-game.js';
 import './hangman-game.js';
 import './drop-game.js';
 import './flappy-game.js';
+import './site-victory.js';
+import './site-day-unavailable.js';
 import './main.js';
