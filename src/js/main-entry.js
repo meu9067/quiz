@@ -1,0 +1,10 @@
+import './site-cookie.js';
+import './site-date.js';
+import './site-page-fade.js';
+import './site-game-ui.js';
+import './forms.js';
+import './memory-game.js';
+import './hangman-game.js';
+import './drop-game.js';
+import './flappy-game.js';
+import './main.js';
