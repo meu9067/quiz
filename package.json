@@ -12,7 +12,7 @@
     "build:static": "node scripts/build-static.js",
     "build": "npm run scss:build && npm run build:js && npm run build:static",
     "watch": "concurrently -k -n server,scss,js \"npm run dev\" \"npm run scss\" \"npm run build:js -- --watch\"",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "test": "node --test"
   },
   "dependencies": {
