@@ -11,19 +11,14 @@
 
   <main class="page page--{{pageName}}">
     {{{body}}}
+
   </main>
+
+  <p class="site-footer"><a href="#" id="clear-cookies-link" class="site-footer__clear-cookies">Clear Cookies</a></p>
+
 
   {{> footer}}
 
-  <script src="/js/site-cookie.js"></script>
-  <script src="/js/site-date.js"></script>
-  <script src="/js/site-page-fade.js"></script>
-  <script src="/js/site-game-ui.js"></script>
-  <script src="/js/forms.js"></script>
-  <script src="/js/memory-game.js"></script>
-  <script src="/js/hangman-game.js"></script>
-  <script src="/js/drop-game.js"></script>
-  <script src="/js/flappy-game.js"></script>
-  <script src="/js/main.js"></script>
+  <script type="module" src="/js/bundle.js"></script>
 </body>
 </html>

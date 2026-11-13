@@ -1,0 +1,26 @@
+.page--victory .victory{
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 0.8fr;
+
+  img {
+    width: 100%;
+  }
+
+  .decoration-left, .decoration-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .decoration-left {
+    align-items: flex-end;
+  }
+
+  .award {
+    font-size: 3rem;
+    margin-top: 1rem;
+  }
+  h2 {
+    margin-bottom: 1rem;
+  }
+}

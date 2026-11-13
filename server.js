@@ -91,6 +91,8 @@ const PAGE_TITLES = {
   signup: 'Inscription',
   quiz: 'Quiz',
   days: 'Tous les jours',
+  victory: 'Victoire',
+  defeat: 'Défaite',
 };
 
 function pageTitle(name) {
@@ -149,6 +151,12 @@ pageNames.forEach((name) => {
       formsByName: formsByPage[name] || {},
       todayDateSlug: formatDateSlug(getCurrentDate()),
       testDateOverride: TEST_DATE_OVERRIDE || '',
+      // The victory page reads these to greet the player by the value and
+      // award their game passed along when it redirected here — see
+      // SiteGameUI.goToVictory() in public/js/site-game-ui.js. Harmless on
+      // every other page, which simply has no `value`/`award` to render.
+      value: req.query.value || '',
+      award: req.query.award || '',
     });
   });
 

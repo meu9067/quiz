@@ -180,6 +180,29 @@
   }
 }
 
+// A victory message layered directly over the frozen animation itself,
+// built by js/flappy-game.js (no markup needed) — shown in addition to
+// [data-flappy-alert] below the field, since that's easy to miss once the
+// game itself has everyone's attention.
+.flappy-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #15803d;
+  background: rgba(220, 252, 231, 0.9);
+  pointer-events: none;
+  &[hidden] {
+    display: none;
+  }
+}
+
 // A distinct, more prominent message shown once the game is over for good
 // (win or final loss) — kept separate from [data-flappy-status] so it's
 // impossible to miss, unlike the status line which just gets replaced.

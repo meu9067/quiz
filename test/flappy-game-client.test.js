@@ -1,12 +1,20 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const { JSDOM } = require('jsdom');
 
-const FLAPPY_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'flappy-game.js'), 'utf8');
-const SITE_COOKIE_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-cookie.js'), 'utf8');
-const SITE_PAGE_FADE_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-page-fade.js'), 'utf8');
+async function loadFlappy(dom) {
+  await new Promise((resolve) => {
+    dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
+  });
+  global.window = dom.window;
+  global.document = dom.window.document;
+  global.location = dom.window.location;
+  global.CustomEvent = dom.window.CustomEvent;
+  global.requestAnimationFrame = () => 0;
+  global.cancelAnimationFrame = () => {};
+  const { initFlappyGame } = await import(`../src/js/flappy-game.js?t=${Date.now()}-${Math.random()}`);
+  initFlappyGame();
+}
 
 // Note: flappy-game.js's gameplay (gravity, flapping, mountain collisions,
 // reaching the goal) is driven by a requestAnimationFrame loop built on
@@ -32,17 +40,17 @@ function flappyMarkup({ storageKey = 'flappy-test' } = {}) {
 
 test('a game already lost on a previous visit stays locked and dimmed on load', async () => {
   const markup = flappyMarkup({ storageKey: 'flappy-already-lost' });
-  const seedHtml = `<!DOCTYPE html><html><body>${markup}<script>${SITE_COOKIE_JS}</script></body></html>`;
+  const seedHtml = `<!DOCTYPE html><html><body>${markup}</body></html>`;
   const seedDom = new JSDOM(seedHtml, { runScripts: 'dangerously', url: 'http://localhost/' });
-  seedDom.window.SiteCookie.setGame('flappy-already-lost', { date: '01-01', failed: true });
+  global.document = seedDom.window.document;
+  const { SiteCookie } = await import('../src/js/site-cookie.js');
+  SiteCookie.setGame('flappy-already-lost', { date: '01-01', failed: true });
   const cookie = seedDom.window.document.cookie;
 
-  const html = `<!DOCTYPE html><html><body>${markup}<script>${SITE_COOKIE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${FLAPPY_JS}</script></body></html>`;
+  const html = `<!DOCTYPE html><html><body>${markup}</body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
   dom.window.document.cookie = cookie;
-  await new Promise((resolve) => {
-    dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
-  });
+  await loadFlappy(dom);
 
   const status = dom.window.document.querySelector('[data-flappy-status]');
   assert.match(status.textContent, /déjà perdu/);
@@ -61,19 +69,14 @@ test('a game already lost on a previous visit stays locked and dimmed on load', 
 
 test('clicking the start button is required before the field reacts to a flap, then kicks off the run', async () => {
   const markup = flappyMarkup({ storageKey: 'flappy-start-test' });
-  const html = `<!DOCTYPE html><html><body>${markup}<script>${SITE_COOKIE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${FLAPPY_JS}</script></body></html>`;
+  const html = `<!DOCTYPE html><html><body>${markup}</body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
-  await new Promise((resolve) => {
-    dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
-  });
+  await loadFlappy(dom);
 
   // jsdom doesn't implement requestAnimationFrame/cancelAnimationFrame —
   // stub them out so clicking "start" (which kicks off the rAF loop) doesn't
   // throw. The loop's actual physics aren't under test here (see the note
   // at the top of this file).
-  dom.window.requestAnimationFrame = () => 0;
-  dom.window.cancelAnimationFrame = () => {};
-
   const status = dom.window.document.querySelector('[data-flappy-status]');
   assert.match(status.textContent, /Commencer/);
 

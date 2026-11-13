@@ -1,14 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const { JSDOM } = require('jsdom');
-
-const HANGMAN_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'hangman-game.js'), 'utf8');
-const SITE_COOKIE_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-cookie.js'), 'utf8');
-const SITE_DATE_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-date.js'), 'utf8');
-const SITE_PAGE_FADE_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-page-fade.js'), 'utf8');
-const SITE_GAME_UI_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-game-ui.js'), 'utf8');
 
 function hangmanMarkup({ word = 'CAT', maxMistakes = 2, storageKey = 'hangman-test' } = {}) {
   return `
@@ -28,16 +20,22 @@ function hangmanMarkup({ word = 'CAT', maxMistakes = 2, storageKey = 'hangman-te
   `;
 }
 
-// Builds a fresh document containing the given markup plus the real shared
-// helpers and public/js/hangman-game.js (inlined, so it runs through the
-// DOM/event lifecycle exactly like it does in a browser).
-async function renderHangman(markup) {
-  const html = `<!DOCTYPE html><html><body data-test-date-override="">${markup}<script>${SITE_COOKIE_JS}</script><script>${SITE_DATE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${SITE_GAME_UI_JS}</script><script>${HANGMAN_JS}</script></body></html>`;
+// Builds a fresh document and initializes the real game module against it.
+async function renderHangman(markup, cookie) {
+  const html = `<!DOCTYPE html><html><body data-test-date-override="">${markup}</body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
+  if (cookie) dom.window.document.cookie = cookie;
 
   await new Promise((resolve) => {
     dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
   });
+
+  global.window = dom.window;
+  global.document = dom.window.document;
+  global.location = dom.window.location;
+  global.CustomEvent = dom.window.CustomEvent;
+  const { initHangmanGame } = await import(`../src/js/hangman-game.js?t=${Date.now()}-${Math.random()}`);
+  initHangmanGame();
 
   return dom;
 }
@@ -71,7 +69,8 @@ test('running out of mistakes loses, records the cookie, and dims the page', asy
   const status = dom.window.document.querySelector('[data-hangman-status]');
   assert.match(status.textContent, /Perdu/);
 
-  const saved = dom.window.SiteCookie.getGame('hangman-lose-test');
+  const { SiteCookie } = await import('../src/js/site-cookie.js');
+  const saved = SiteCookie.getGame('hangman-lose-test');
   assert.ok(saved && saved.failed === true);
 
   const section = dom.window.document.querySelector('main > section');
@@ -80,17 +79,14 @@ test('running out of mistakes loses, records the cookie, and dims the page', asy
 
 test('a game already lost on a previous visit stays locked and dimmed on load', async () => {
   const markup = hangmanMarkup({ word: 'CAT', storageKey: 'hangman-already-lost' });
-  const seedHtml = `<!DOCTYPE html><html><body data-test-date-override="">${markup}<script>${SITE_COOKIE_JS}</script></body></html>`;
+  const seedHtml = `<!DOCTYPE html><html><body data-test-date-override="">${markup}</body></html>`;
   const seedDom = new JSDOM(seedHtml, { runScripts: 'dangerously', url: 'http://localhost/' });
-  seedDom.window.SiteCookie.setGame('hangman-already-lost', { date: '01-01', failed: true });
+  global.document = seedDom.window.document;
+  const { SiteCookie } = await import('../src/js/site-cookie.js');
+  SiteCookie.setGame('hangman-already-lost', { date: '01-01', failed: true });
   const cookie = seedDom.window.document.cookie;
 
-  const html = `<!DOCTYPE html><html><body data-test-date-override="">${markup}<script>${SITE_COOKIE_JS}</script><script>${SITE_DATE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${SITE_GAME_UI_JS}</script><script>${HANGMAN_JS}</script></body></html>`;
-  const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
-  dom.window.document.cookie = cookie;
-  await new Promise((resolve) => {
-    dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
-  });
+  const dom = await renderHangman(markup, cookie);
 
   const status = dom.window.document.querySelector('[data-hangman-status]');
   assert.match(status.textContent, /déjà perdu/);

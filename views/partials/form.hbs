@@ -7,6 +7,9 @@
   {{#if maxAttempts}}data-max-attempts="{{maxAttempts}}"{{/if}}
   {{#if lockoutMessage}}data-lockout-message="{{lockoutMessage}}"{{/if}}
   {{#if quizStorageKey}}data-quiz-storage-key="{{quizStorageKey}}"{{/if}}
+  {{#if redirectToVictory}}data-victory-redirect="true"{{/if}}
+  {{#if victoryValueField}}data-victory-value-field="{{victoryValueField}}"{{/if}}
+  {{#if victoryAward}}data-victory-award="{{victoryAward}}"{{/if}}
 >
   {{#each fields}}
     {{#if (eq type "checkbox")}}

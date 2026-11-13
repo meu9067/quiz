@@ -59,6 +59,7 @@ function quiz(fieldType) {
     successMessage = 'Correct ! Bien joué.',
     errorMessage = 'Pas tout à fait — retente ta chance.',
     lockoutMessage = "Tu as utilisé ta tentative pour aujourd'hui — reviens un autre jour pour réessayer.",
+    victoryAward,
   }) => ({
     page,
     submitLabel,
@@ -71,6 +72,16 @@ function quiz(fieldType) {
     // Follows the same `<game>-<date>` scheme used by js/hangman-game.js
     // and js/drop-game.js's storage keys.
     quizStorageKey: storageKey || `quiz-${page}`,
+    // A quiz is won the moment the right answer is submitted — no separate
+    // "claim your win" step — so it redirects straight to the shared
+    // victory page on success, the same way the win-claim forms do (see
+    // data-victory-redirect handling in js/forms.js). The chosen option's
+    // value (e.g. "b") is passed along as there's no player-name field here.
+    redirectToVictory: true,
+    victoryValueField: 'choice',
+    // A fixed prize amount for this day, shown on the victory page
+    // alongside `value` — see `victoryAward` handling in js/forms.js.
+    victoryAward,
     fields: [
       {
         name: 'choice',
@@ -188,6 +199,7 @@ module.exports = {
     page: '11-07',
     question: 'Combien font 2 + 2 ?',
     successMessage: "Correct ! Tu as réussi le quiz du jour.",
+    victoryAward: 'Lettre A',
     options: [
       { value: 'a', label: '3' },
       { value: 'b', label: '4', correct: true },
@@ -198,6 +210,7 @@ module.exports = {
   dayQuiz1108: radioQuiz({
     page: '11-08',
     question: 'Quelle planète est surnommée la planète rouge ?',
+    victoryAward: 'Lettre B',
     options: [
       { value: 'a', label: 'Vénus' },
       { value: 'b', label: 'Mars', correct: true },
@@ -208,6 +221,7 @@ module.exports = {
   dayQuiz1106: imageQuiz({
     page: '11-06',
     question: 'Sélectionne le chien que papi avait quand il était jeune.',
+    victoryAward: 'Lettre C',
     options: [
       { value: 'a', label: 'A', image: '/images/quiz/dog1.png' },
       { value: 'b', label: 'B', image: '/images/quiz/dog2.png', correct: true },
@@ -223,6 +237,11 @@ module.exports = {
     submitLabel: 'Réclamer ta victoire',
     successMessage: 'Bien joué — ta victoire a été enregistrée !',
     errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
+    // Sends the player on to the shared victory page once the claim
+    // succeeds — see data-victory-redirect handling in js/forms.js.
+    redirectToVictory: true,
+    victoryValueField: 'playerName',
+    victoryAward: 'Lettre D',
     fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
   },
 
@@ -234,7 +253,9 @@ module.exports = {
     submitLabel: 'Réclamer ta victoire',
     successMessage: 'Bien deviné — ta victoire a été enregistrée !',
     errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
-    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
+    redirectToVictory: true,
+    victoryValueField: 'playerName',
+    victoryAward: 'Lettre E',
   },
 
   // Unlocked once the drag-and-drop game on this day's page is won — see
@@ -245,7 +266,9 @@ module.exports = {
     submitLabel: 'Réclamer ta victoire',
     successMessage: 'Bien trié — ta victoire a été enregistrée !',
     errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
-    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
+    redirectToVictory: true,
+    victoryValueField: 'playerName',
+    victoryAward: 'Lettre D',
   },
 
   // Unlocked once the flappy-bird game on this day's page is won — see
@@ -256,6 +279,8 @@ module.exports = {
     submitLabel: 'Réclamer ta victoire',
     successMessage: 'Bien volé — ta victoire a été enregistrée !',
     errorMessage: 'Merci de saisir ton prénom pour réclamer ta victoire.',
-    fields: [{ name: 'playerName', label: 'Ton prénom', type: 'text', required: true, minlength: 1 }],
+    redirectToVictory: true,
+    victoryValueField: 'playerName',
+    victoryAward: 'Lettre F',
   },
 };

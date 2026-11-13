@@ -8,9 +8,10 @@
     "dev": "nodemon server.js",
     "scss": "sass --watch scss/main.scss:public/css/main.css",
     "scss:build": "sass scss/main.scss:public/css/main.css --style=compressed",
+    "build:js": "vite build",
     "build:static": "node scripts/build-static.js",
-    "build": "npm run scss:build && npm run build:static",
-    "watch": "concurrently -k -n server,scss \"npm run dev\" \"npm run scss\"",
+    "build": "npm run scss:build && npm run build:js && npm run build:static",
+    "watch": "concurrently -k -n server,scss,js \"npm run dev\" \"npm run scss\" \"npm run build:js -- --watch\"",
     "test": "node --test"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "concurrently": "^10.0.7",
     "jsdom": "^31.0.0",
     "nodemon": "^3.1.4",
-    "sass": "^1.77.8"
+    "sass": "^1.77.8",
+    "vite": "^8.3.8"
   }
 }

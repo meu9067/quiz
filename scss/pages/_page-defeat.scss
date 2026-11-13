@@ -1,0 +1,117 @@
+@use '../abstracts/variables' as *;
+
+
+.page.page--defeat {
+  background: #ef4444;
+  border: 20px solid #fff;
+  border-radius: 8px;
+position: relative;
+
+
+  .hamilton {
+    position: absolute;
+    width: 25vw;
+    z-index: 1;
+    left: 1vw;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .bar-wrapper {
+
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      background: #fff;
+      height: 61%;
+      width: 81%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
+
+    .bar {
+      background-image:url('/images/defeat/defeat2.png');
+      background-position: right;
+      background-size: contain;
+      height: 224px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-repeat: no-repeat;
+
+      padding: 10px;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+
+  h1 {
+    font-family: $font-family-2;
+    font-size: 4rem;
+    color: #c1ff72;
+    margin: 0;
+    margin-top: 4rem;
+    animation-name: tada;
+    animation-duration: 1s;
+  }
+  h3 {
+    margin-top: 0;
+    font-family: $font-family-2;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  h4 {
+    font-family: $font-family-2;
+    font-size: 1.4rem;
+    line-height: 1;
+    margin-top: 0.5rem;
+    color: #fff;
+
+  }
+
+
+
+  p {
+    color: #00bf63;
+    font-size: 1.3rem;
+  }
+
+  strong {
+    color:#ef4444;
+  }
+
+}
+
+@keyframes tada {
+  from {
+    transform: scale3d(1, 1, 1);
+  }
+
+  10%,
+  20% {
+    transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -5deg);
+  }
+
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 5deg);
+  }
+
+  40%,
+  60%,
+  80% {
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -5deg);
+  }
+
+  to {
+    transform: scale3d(1, 1, 1) ;
+  }
+}

@@ -1,11 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const { JSDOM } = require('jsdom');
-
-const MEMORY_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'memory-game.js'), 'utf8');
-const SITE_GAME_UI_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'site-game-ui.js'), 'utf8');
 
 function memoryMarkup({ pairs = 2 } = {}) {
   return `
@@ -20,12 +15,18 @@ function memoryMarkup({ pairs = 2 } = {}) {
 }
 
 async function renderMemory(markup) {
-  const html = `<!DOCTYPE html><html><body>${markup}<script>${SITE_GAME_UI_JS}</script><script>${MEMORY_JS}</script></body></html>`;
+  const html = `<!DOCTYPE html><html><body>${markup}</body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
 
   await new Promise((resolve) => {
     dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
   });
+
+  global.window = dom.window;
+  global.document = dom.window.document;
+  global.CustomEvent = dom.window.CustomEvent;
+  const { initMemoryGame } = await import(`../src/js/memory-game.js?t=${Date.now()}-${Math.random()}`);
+  initMemoryGame();
 
   return dom;
 }

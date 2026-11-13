@@ -1,35 +1,23 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const { JSDOM } = require('jsdom');
 
-const FORMS_JS = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'forms.js'), 'utf8');
-const SITE_COOKIE_JS = fs.readFileSync(
-  path.join(__dirname, '..', 'public', 'js', 'site-cookie.js'),
-  'utf8'
-);
-const SITE_PAGE_FADE_JS = fs.readFileSync(
-  path.join(__dirname, '..', 'public', 'js', 'site-page-fade.js'),
-  'utf8'
-);
-const SITE_DATE_JS = fs.readFileSync(
-  path.join(__dirname, '..', 'public', 'js', 'site-date.js'),
-  'utf8'
-);
-
-// Builds a fresh document containing the given form markup plus the real
-// public/js/site-cookie.js, public/js/site-date.js, public/js/site-page-fade.js
-// and public/js/forms.js (inlined, so it runs through the DOM/event
-// lifecycle exactly like it does in a browser — including waiting for
-// DOMContentLoaded before wiring up listeners).
-async function renderForm(formHtml) {
-  const html = `<!DOCTYPE html><html><body>${formHtml}<script>${SITE_COOKIE_JS}</script><script>${SITE_DATE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${FORMS_JS}</script></body></html>`;
+// Builds a fresh document and initializes the real form module against it.
+async function renderForm(formHtml, cookie) {
+  const html = `<!DOCTYPE html><html><body>${formHtml}</body></html>`;
   const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/' });
+  if (cookie) dom.window.document.cookie = cookie;
 
   await new Promise((resolve) => {
     dom.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
   });
+
+  global.window = dom.window;
+  global.document = dom.window.document;
+  global.location = dom.window.location;
+  global.CustomEvent = dom.window.CustomEvent;
+  const { initForms } = await import(`../src/js/forms.js?t=${Date.now()}-${Math.random()}`);
+  initForms();
 
   return dom;
 }
@@ -136,7 +124,8 @@ test('data-save-cookie-field stores the given field in the shared site cookie on
 
   submit(form);
 
-  assert.equal(dom.window.SiteCookie.get('name'), 'Grace');
+  const { SiteCookie } = await import('../src/js/site-cookie.js');
+  assert.equal(SiteCookie.get('name'), 'Grace');
   assert.match(dom.window.document.cookie, /(?:^|; )site-data=/);
 });
 
@@ -188,7 +177,8 @@ test('a quiz with data-max-attempts allows one wrong answer before locking', asy
   assert.equal(status.textContent, 'Not quite — try again.');
   assert.ok(status.classList.contains('form-status--error'));
   assert.equal(form.querySelector('[value="b"]').disabled, false, 'inputs stay enabled after the first miss');
-  assert.equal(dom.window.SiteCookie.getGame('image-quiz-11-06'), null);
+  const { SiteCookie } = await import('../src/js/site-cookie.js');
+  assert.equal(SiteCookie.getGame('image-quiz-11-06'), null);
 });
 
 test('a quiz with data-max-attempts locks and records the cookie after a second wrong answer', async () => {
@@ -206,7 +196,8 @@ test('a quiz with data-max-attempts locks and records the cookie after a second 
   assert.ok(status.classList.contains('form-status--error'));
   assert.ok([...form.elements].every((field) => field.disabled), 'every field is disabled once locked');
 
-  const saved = dom.window.SiteCookie.getGame('image-quiz-11-06');
+  const { SiteCookie } = await import('../src/js/site-cookie.js');
+  const saved = SiteCookie.getGame('image-quiz-11-06');
   assert.ok(saved && saved.failed === true);
 });
 
@@ -220,12 +211,7 @@ test('a quiz with data-max-attempts stays locked across a fresh page load once a
 
   const cookie = firstLoad.window.document.cookie;
 
-  const html = `<!DOCTYPE html><html><body>${quizMarkup()}<script>${SITE_COOKIE_JS}</script><script>${SITE_DATE_JS}</script><script>${SITE_PAGE_FADE_JS}</script><script>${FORMS_JS}</script></body></html>`;
-  const secondLoad = new (require('jsdom').JSDOM)(html, { runScripts: 'dangerously', url: 'http://localhost/' });
-  secondLoad.window.document.cookie = cookie;
-  await new Promise((resolve) => {
-    secondLoad.window.document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
-  });
+  const secondLoad = await renderForm(quizMarkup(), cookie);
 
   const secondForm = secondLoad.window.document.getElementById('dayQuiz-form');
   const secondStatus = secondForm.querySelector('[data-form-status]');
