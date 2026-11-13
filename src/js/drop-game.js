@@ -178,6 +178,9 @@ export function initDropGame() {
       matched += 1;
       setStatus(`Correct ! ${matched} / ${totalValid} trouvés.`);
 
+      target.classList.add('is-right-flash');
+      setTimeout(() => target.classList.remove('is-right-flash'), 400);
+
       if (matched === totalValid) {
         onWin();
       }
@@ -190,6 +193,9 @@ export function initDropGame() {
       obj.style.top = obj.dataset.homeTop;
       setStatus(`Ce n'est pas le bon — il repart à sa place. ${Math.max(maxMistakes - mistakes, 0)} erreurs restantes.`);
       setTimeout(() => obj.classList.remove('is-wrong', 'is-returning'), 400);
+
+      target.classList.add('is-wrong-flash');
+      setTimeout(() => target.classList.remove('is-wrong-flash'), 400);
 
       if (mistakes >= maxMistakes) {
         onLose();

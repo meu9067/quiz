@@ -6,6 +6,7 @@
 // components/ reusable, self-contained UI pieces (buttons, forms, games)
 // pages/      styles scoped to the <main> page wrapper
 @use 'abstracts/variables' as *;
+@use 'abstracts/animations';
 
 @use 'base/fonts';
 @use 'base/reset';

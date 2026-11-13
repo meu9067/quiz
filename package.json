@@ -10,7 +10,8 @@
     "scss:build": "sass scss/main.scss:public/css/main.css --style=compressed",
     "build:js": "vite build",
     "build:static": "node scripts/build-static.js",
-    "build": "npm run scss:build && npm run build:js && npm run build:static",
+    "build:images": "node scripts/optimize-images.js",
+    "build": "npm run scss:build && npm run build:js && npm run build:static && npm run build:images",
     "watch": "concurrently -k -n server,scss,js \"npm run dev\" \"npm run scss\" \"npm run build:js -- --watch\"",
     "deploy": "npm run build && wrangler deploy",
     "test": "node --test"
@@ -24,6 +25,7 @@
     "jsdom": "^31.0.0",
     "nodemon": "^3.1.4",
     "sass": "^1.77.8",
+    "sharp": "^0.35.5",
     "vite": "^8.3.8",
     "wrangler": "4.160.1"
   }
